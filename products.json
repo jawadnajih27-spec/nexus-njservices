@@ -1,0 +1,23 @@
+[
+  {
+    "id": "prod_sample1_dig",
+    "name": "Elite Landing Page Template",
+    "type": "digital",
+    "price": 49,
+    "description": "A high-converting, luxury landing page template. Includes full source code, Tailwind CSS, and GSAP animations. Instant download.",
+    "imageUrl": "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=600&q=80",
+    "downloadUrl": "",
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "prod_sample2_phys",
+    "name": "Luxury Planner Notebook",
+    "type": "physical",
+    "price": 29,
+    "description": "Premium leather-bound planner with gold foil accents. 200 pages of thick ivory paper. Ships within 5-7 business days.",
+    "imageUrl": "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=600&q=80",
+    "downloadUrl": "",
+    "stock": 50,
+    "createdAt": "2025-01-01T00:00:00.000Z"
+  }
+]

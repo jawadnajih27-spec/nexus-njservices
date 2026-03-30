@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Download Ready — Royal Nexus</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "DM Sans", sans-serif;
+      background: #FDFDFD;
+      color: #1A1A2E;
+      min-height: 100vh;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      padding: 24px;
+    }
+
+    /* ── Luxury background ─────────────────────── */
+    body::before {
+      content: "";
+      position: fixed; inset: 0; z-index: -1;
+      background:
+        radial-gradient(ellipse 90% 60% at 50% -10%, rgba(75,0,130,0.08) 0%, transparent 65%),
+        radial-gradient(ellipse 60% 40% at 80% 110%, rgba(139,0,0,0.06) 0%, transparent 55%);
+    }
+
+    /* ── Success card ──────────────────────────── */
+    .success-card {
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255,255,255,0.95);
+      border-radius: 24px;
+      padding: 48px 40px;
+      max-width: 460px; width: 100%;
+      box-shadow:
+        0 4px 24px rgba(75,0,130,0.08),
+        0 24px 80px rgba(139,0,0,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+      text-align: center;
+    }
+
+    /* ── Animated checkmark ────────────────────── */
+    .check-circle {
+      width: 72px; height: 72px;
+      border-radius: 50%; margin: 0 auto 28px;
+      background: linear-gradient(135deg, rgba(75,0,130,0.1), rgba(139,0,0,0.08));
+      display: flex; align-items: center; justify-content: center;
+      position: relative;
+    }
+    .check-circle::before {
+      content: "";
+      position: absolute; inset: -2px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #4B0082, #8B0000);
+      -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      -webkit-mask-composite: xor; mask-composite: exclude;
+      padding: 2px;
+    }
+    .check-circle svg {
+      animation: drawCheck 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+    }
+    @keyframes drawCheck {
+      0% { transform: scale(0) rotate(-45deg); opacity: 0; }
+      100% { transform: scale(1) rotate(0); opacity: 1; }
+    }
+
+    /* ── Gradient text ─────────────────────────── */
+    .gradient-text {
+      background: linear-gradient(135deg, #4B0082, #C41E3A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    /* ── Divider ───────────────────────────────── */
+    .divider {
+      height: 1px; margin: 24px 0;
+      background: linear-gradient(90deg, transparent, rgba(139,0,0,0.15), rgba(75,0,130,0.15), transparent);
+    }
+
+    /* ── Download button ───────────────────────── */
+    .btn-download {
+      display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 14px 28px; border-radius: 12px;
+      background: linear-gradient(135deg, #4B0082, #7B2FBE);
+      color: #FDFDFD; font-family: "DM Sans", sans-serif;
+      font-size: 15px; font-weight: 500; letter-spacing: 0.02em;
+      text-decoration: none; border: none; cursor: pointer;
+      box-shadow: 0 4px 20px rgba(75,0,130,0.35);
+      transition: all 0.25s ease;
+      animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.4s both;
+    }
+    .btn-download:hover {
+      box-shadow: 0 6px 28px rgba(75,0,130,0.45);
+      transform: translateY(-2px);
+    }
+
+    /* ── Info chip ─────────────────────────────── */
+    .info-chip {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 20px; font-size: 11px;
+      background: rgba(75,0,130,0.07); color: #4B0082;
+      border: 1px solid rgba(75,0,130,0.15);
+    }
+
+    /* ── Animations ────────────────────────────── */
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .card-enter {
+      animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+
+    /* ── Confetti canvas ───────────────────────── */
+    #confetti-canvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 10;
+    }
+
+    /* ── Error state ───────────────────────────── */
+    .error-state { display: none; }
+    .error-state.visible { display: block; }
+    .success-state { display: block; }
+    .success-state.hidden { display: none; }
+  </style>
+</head>
+<body>
+  <!-- Confetti canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="success-card card-enter">
+
+    <!-- SUCCESS STATE -->
+    <div class="success-state" id="success-state">
+
+      <!-- Check icon -->
+      <div class="check-circle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="url(#check-grad)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <defs>
+            <linearGradient id="check-grad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#4B0082"/>
+              <stop offset="100%" stop-color="#C41E3A"/>
+            </linearGradient>
+          </defs>
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+
+      <!-- Heading -->
+      <h1 class="font-display text-4xl font-light mb-2 leading-tight">
+        Payment <span class="gradient-text italic">Confirmed</span>
+      </h1>
+      <p class="text-muted text-sm font-light mb-5" id="product-name-display">Your product is ready.</p>
+
+      <!-- Order info -->
+      <div class="info-chip mb-2" id="order-id-chip">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        Order ID: —
+      </div>
+
+      <div class="divider"></div>
+
+      <!-- Download button -->
+      <a id="download-btn" href="#" class="btn-download" target="_blank">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3v-1m-4-4-4 4m0 0-4-4m4 4V4"/></svg>
+        Download Your Product
+      </a>
+
+      <!-- Timer note -->
+      <p class="text-xs text-muted mt-4" style="font-style: italic;">
+        Save your download link — it may expire based on your file host settings.
+      </p>
+
+      <div class="divider"></div>
+
+      <!-- Footer links -->
+      <div class="flex items-center justify-center gap-5 text-xs">
+        <a href="index.html" class="text-muted hover:text-ink transition-colors">← Back to Store</a>
+        <span class="text-muted/30">|</span>
+        <a id="whatsapp-support" href="#" class="text-muted hover:text-ink transition-colors" target="_blank">💬 WhatsApp Support</a>
+      </div>
+
+    </div><!-- /#success-state -->
+
+    <!-- ERROR STATE (no download URL found) -->
+    <div class="error-state" id="error-state">
+      <div class="text-4xl mb-4">⚠️</div>
+      <h1 class="font-display text-2xl font-semibold mb-2">Link Not Found</h1>
+      <p class="text-sm text-muted mb-6">
+        Your download link could not be found. This usually happens when the page is visited directly.
+        If you completed payment, please contact support.
+      </p>
+      <a id="whatsapp-error"
+         href="#"
+         target="_blank"
+         class="btn-download" style="background: linear-gradient(135deg, #8B0000, #C41E3A);">
+        Contact Support via WhatsApp
+      </a>
+      <a href="index.html" class="block mt-4 text-xs text-muted text-center hover:text-ink">← Return to Store</a>
+    </div>
+
+  </div>
+
+  <!-- Footer -->
+  <p class="text-xs text-muted mt-8 font-display italic">Royal Nexus © 2025 · NJSERVICES</p>
+
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    /**
+     * success.html — Reads the purchase data from URL hash params.
+     *
+     * After PayPal onApprove, redirect here with:
+     * success.html#product=NAME&orderId=XXX&dl=ENCODED_HEX_URL
+     *
+     * The encoded download URL is decoded client-side using app.js decodeDownloadUrl()
+     */
+
+    (function init() {
+      // Set up WhatsApp support links
+      const waNumber = ROYAL_CONFIG.store.whatsapp;
+      const waMsg = encodeURIComponent("Hello, I need help with my Royal Nexus purchase.");
+      const waUrl = `https://wa.me/${waNumber}?text=${waMsg}`;
+      document.getElementById("whatsapp-support").href = waUrl;
+      document.getElementById("whatsapp-error").href = waUrl;
+
+      // Parse URL hash params: success.html#key=value&key2=value2
+      const hash = window.location.hash.slice(1);
+      if (!hash) return showError();
+
+      const params = {};
+      hash.split("&").forEach((pair) => {
+        const [k, v] = pair.split("=");
+        if (k && v) params[decodeURIComponent(k)] = decodeURIComponent(v);
+      });
+
+      const { product, orderId, dl } = params;
+
+      // Validate we have a download URL
+      if (!dl) return showError();
+
+      try {
+        const downloadUrl = decodeDownloadUrl(dl);
+
+        // Populate the UI
+        if (product) {
+          document.getElementById("product-name-display").textContent = `Thank you for purchasing: ${product}`;
+        }
+        if (orderId) {
+          document.getElementById("order-id-chip").innerHTML =
+            `<svg xmlns="http://www.w3.org/2000/svg" class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0 1 12 2.944a11.955 11.955 0 0 1-8.618 3.04A12.02 12.02 0 0 0 3 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+            Order ID: ${orderId}`;
+        }
+
+        document.getElementById("download-btn").href = downloadUrl;
+
+        // 🎉 Confetti
+        launchConfetti();
+
+      } catch (err) {
+        console.error("[RoyalNexus] Success page decode error:", err);
+        showError();
+      }
+    })();
+
+    function showError() {
+      document.getElementById("success-state").classList.add("hidden");
+      document.getElementById("error-state").classList.add("visible");
+    }
+
+    // ─────────────────────────────────────────────
+    // CONFETTI (Pure Canvas, no library)
+    // ─────────────────────────────────────────────
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ["#8B0000", "#C41E3A", "#4B0082", "#7B2FBE", "#FFD700", "#FDFDFD"];
+      const particles = Array.from({ length: 80 }, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        size: Math.random() * 8 + 4,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        speed: Math.random() * 3 + 1.5,
+        angle: Math.random() * 360,
+        spin: (Math.random() - 0.5) * 4,
+        drift: (Math.random() - 0.5) * 1.5,
+      }));
+
+      let frame = 0;
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        particles.forEach((p) => {
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate((p.angle * Math.PI) / 180);
+          ctx.fillStyle = p.color;
+          ctx.globalAlpha = Math.max(0, 1 - frame / 150);
+          ctx.fillRect(-p.size / 2, -p.size / 4, p.size, p.size / 2);
+          ctx.restore();
+
+          p.y += p.speed;
+          p.x += p.drift;
+          p.angle += p.spin;
+        });
+
+        frame++;
+        if (frame < 160) requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+
+      draw();
+    }
+  </script>
+</body>
+</html>
