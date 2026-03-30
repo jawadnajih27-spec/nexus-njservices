@@ -114,7 +114,7 @@ function getGitHubHeaders() {
   }
 
   return headers;
-
+}
 // ──────────────────────────────────────────────────────────
 // Helper: Build GitHub Contents API URL
 // ──────────────────────────────────────────────────────────
