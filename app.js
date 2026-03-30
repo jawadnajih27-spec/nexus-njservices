@@ -15,6 +15,8 @@
  * The SHA is required for any subsequent PUT (update) operation.
  */
 async function fetchProducts() {
+  validateGitHubConfig(); 
+
   const url = getGitHubUrl(ROYAL_CONFIG.github.productsPath, {
     ref: ROYAL_CONFIG.github.branch,
   });
@@ -36,14 +38,32 @@ async function fetchProducts() {
 
       // If products.json does not exist yet, allow first-time bootstrap. 
 
+// But only after confirming the target repo itself is reachable. 
+
 if (res.status === 404) { 
 
+const repoCheck = await checkGitHubRepoAccess(); 
+
+if (!repoCheck.ok) { 
+
+throw new Error(repoCheck.message); 
+
+}
+
+
+
 console.warn("[RoyalNexus] products file not found on GitHub. Initializing empty catalog."); 
+
 return { 
+
 products: [], 
+
 sha: null, 
+
 }; 
-} 
+
+}
+
 
       throw new Error(`GitHub GET failed: ${res.status} — ${details}`);
     }
@@ -73,6 +93,8 @@ sha: null,
  * @param {string} message   - Git commit message
  */
 async function saveProducts(products, sha, message = "Update products via Royal Nexus Manager") {
+validateGitHubConfig(); 
+  
   const url = getGitHubUrl(ROYAL_CONFIG.github.productsPath);
 
   // Encode the JSON string to Base64 (required by GitHub API)
@@ -89,15 +111,72 @@ body.sha = sha;
 }
 
   try {
-    const res = await fetch(url, {
+    let res = await fetch(url, {
       method: "PUT",
       headers: getGitHubHeaders(),
       body: JSON.stringify(body),
     });
 
+    // Auto-recover when the stored SHA became stale (race condition) or file was recreated. 
+
+if (res.status === 409) { 
+
+const latest = await fetchProducts(); 
+
+body.sha = latest.sha || undefined; 
+
+body.content = btoa(unescape(encodeURIComponent(JSON.stringify(products, null, 2)))); 
+
+res = await fetch(url, { 
+
+method: "PUT", 
+
+headers: getGitHubHeaders(), 
+
+body: JSON.stringify(body), 
+
+}); 
+
+} 
+
+
+
     if (!res.ok) {
-      const errData = await res.json();
-      throw new Error(`GitHub PUT failed: ${res.status} — ${errData.message}`);
+      let details = res.statusText; 
+
+try { 
+
+const errData = await res.json(); 
+
+details = errData.message || details; 
+
+} catch (_) { 
+
+// Keep fallback status text when body isn't JSON. 
+
+} 
+
+if (res.status === 404) { 
+
+const repoCheck = await checkGitHubRepoAccess(); 
+
+if (!repoCheck.ok) { 
+
+throw new Error(repoCheck.message); 
+
+} 
+
+throw new Error( 
+
+"GitHub path not found. Confirm github.productsPath exists and points to a valid file location." 
+
+); 
+
+} 
+
+throw new Error(`GitHub PUT failed: ${res.status} — ${details}`);
+
+
     }
 
     return await res.json();
@@ -210,6 +289,70 @@ function encodeDownloadUrl(url) {
 function decodeDownloadUrl(hex) {
   const chars = hex.match(/.{1,2}/g).map((h) => String.fromCharCode(parseInt(h, 16)));
   return xorObfuscate(chars.join(""));
+}
+
+// ════════════════════════════════════════════════════════════
+// SECTION 3.5: GITHUB CONFIGURATION GUARDS
+// ════════════════════════════════════════════════════════════
+
+let githubRepoAccessCache = null;
+
+function validateGitHubConfig() {
+  const github = ROYAL_CONFIG?.github || {};
+  const missing = [];
+
+  if (!String(github.owner || "").trim()) missing.push("owner");
+  if (!String(github.repo || "").trim()) missing.push("repo");
+  if (!String(github.branch || "").trim()) missing.push("branch");
+  if (!String(github.productsPath || "").trim()) missing.push("productsPath");
+
+  if (missing.length) {
+    throw new Error(`GitHub configuration is incomplete. Missing: ${missing.join(", ")}`);
+  }
+
+  if (!String(github.pat || "").trim()) {
+    throw new Error("GitHub PAT is missing. Add github.pat in config.js before adding products.");
+  }
+}
+
+async function checkGitHubRepoAccess() {
+  if (githubRepoAccessCache) {
+    return githubRepoAccessCache;
+  }
+
+  const { owner, repo } = ROYAL_CONFIG.github;
+  const repoUrl = `https://api.github.com/repos/${owner}/${repo}`;
+
+  try {
+    const res = await fetch(repoUrl, {
+      headers: getGitHubHeaders(),
+    });
+
+    if (res.ok) {
+      githubRepoAccessCache = { ok: true };
+      return githubRepoAccessCache;
+    }
+
+    let details = res.statusText;
+    try {
+      const errData = await res.json();
+      details = errData.message || details;
+    } catch (_) {
+      // Keep fallback status text when body isn't JSON.
+    }
+
+    githubRepoAccessCache = {
+      ok: false,
+      message: `Cannot access GitHub repo ${owner}/${repo}: ${res.status} — ${details}`,
+    };
+    return githubRepoAccessCache;
+  } catch (err) {
+    githubRepoAccessCache = {
+      ok: false,
+      message: `GitHub repository check failed: ${err.message}`,
+    };
+    return githubRepoAccessCache;
+  }
 }
 
 // ════════════════════════════════════════════════════════════
