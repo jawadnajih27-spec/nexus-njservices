@@ -503,17 +503,133 @@
 
   <!-- SCRIPTS -->
   <script src="config.js"></script>
+  <script> 
+
+// Fallback config when config.js is missing in deployment (e.g., not committed or not served). 
+
+if (!window.ROYAL_CONFIG) { 
+
+window.ROYAL_CONFIG = { 
+
+github: { 
+
+pat: "", 
+
+owner: "jawadnajih27-spec", 
+
+repo: "royal-nexus-store", 
+
+branch: "main", 
+
+productsPath: "data/products.json", 
+
+}, 
+
+paypal: { 
+
+clientId: "YOUR_PAYPAL_CLIENT_ID_HERE", 
+
+currency: "USD", 
+
+get sdkUrl() { 
+
+return `https://www.paypal.com/sdk/js?client-id=${this.clientId}&currency=${this.currency}`; 
+
+}, 
+
+}, 
+
+cloudinary: { 
+
+cloudName: "dztczxekd", 
+
+uploadPreset: "royal_nexus_unsigned", 
+
+get uploadUrl() { 
+
+return `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`; 
+
+}, 
+
+}, 
+
+manager: { 
+
+accessPassword: "njservices25", 
+
+}, 
+
+security: { 
+
+obfuscationKey: "NJSERVICES_ROYAL_KEY_2025", 
+
+}, 
+
+}; 
+
+} 
+
+if (typeof window.getGitHubHeaders !== "function") { 
+
+window.getGitHubHeaders = function getGitHubHeaders() { 
+
+const headers = { 
+
+"Accept": "application/vnd.github+json", 
+
+"Content-Type": "application/json", 
+
+}; 
+
+const pat = (window.ROYAL_CONFIG.github.pat || "").trim(); 
+
+if (pat) { 
+
+headers["Authorization"] = pat.startsWith("github_pat_") ? `Bearer ${pat}` : `token ${pat}`; 
+
+} 
+
+return headers; 
+
+}; 
+
+} 
+
+if (typeof window.getGitHubUrl !== "function") { 
+
+window.getGitHubUrl = function getGitHubUrl(path, options = {}) { 
+
+const { owner, repo } = window.ROYAL_CONFIG.github; 
+
+const normalizedPath = String(path || "").replace(/^\/+/, ""); 
+
+let url = `https://api.github.com/repos/${owner}/${repo}/contents/${normalizedPath}`; 
+
+if (options.ref) { 
+
+url += `?ref=${encodeURIComponent(options.ref)}`; 
+
+} 
+
+return url; 
+
+}; 
+
+} 
+
+</script>
+
+
   <script src="app.js"></script>
   <script>
     // ─────────────────────────────────────────────
     // AUTH
     // ─────────────────────────────────────────────
     function checkAuth() {
-      const input = document.getElementById("auth-password");
       const errorEl = document.getElementById("auth-error");
       const pw = input.value;
 
-      errorEl.classList.add("hidden");
+            errorEl.classList.add("hidden");
 
       if (!window.ROYAL_CONFIG || !ROYAL_CONFIG.manager) {
         errorEl.textContent = "Configuration error: ROYAL_CONFIG is missing.";
