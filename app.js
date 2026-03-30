@@ -15,7 +15,9 @@
  * The SHA is required for any subsequent PUT (update) operation.
  */
 async function fetchProducts() {
-  const url = getGitHubUrl(ROYAL_CONFIG.github.productsPath);
+  const url = getGitHubUrl(ROYAL_CONFIG.github.productsPath, {
+    ref: ROYAL_CONFIG.github.branch,
+  });
 
   try {
     const res = await fetch(url, {
@@ -23,7 +25,16 @@ async function fetchProducts() {
     });
 
     if (!res.ok) {
-      throw new Error(`GitHub GET failed: ${res.status} ${res.statusText}`);
+   let details = res.statusText;
+
+      try {
+        const errData = await res.json();
+        details = errData.message || details;
+      } catch (_) {
+        // Keep fallback status text when body isn't JSON.
+      }
+
+      throw new Error(`GitHub GET failed: ${res.status} — ${details}`);
     }
 
     const data = await res.json();
