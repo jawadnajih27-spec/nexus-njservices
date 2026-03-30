@@ -509,15 +509,28 @@
     // AUTH
     // ─────────────────────────────────────────────
     function checkAuth() {
-      const pw = document.getElementById("auth-password").value;
       const input = document.getElementById("auth-password");
+      const errorEl = document.getElementById("auth-error");
+      const pw = input.value;
+
+      errorEl.classList.add("hidden");
+
+      if (!window.ROYAL_CONFIG || !ROYAL_CONFIG.manager) {
+        errorEl.textContent = "Configuration error: ROYAL_CONFIG is missing.";
+        errorEl.classList.remove("hidden");
+        console.error("[RoyalNexus] Missing ROYAL_CONFIG in manager.html");
+        return;
+      }
+
       if (pw === ROYAL_CONFIG.manager.accessPassword) {
         document.getElementById("auth-gate").style.display = "none";
         document.getElementById("dashboard").style.display = "block";
         loadProducts();
       } else {
         input.classList.add("error");
-        document.getElementById("auth-error").classList.remove("hidden");
+        errorEl.textContent = "Incorrect password. Try again."; 
+errorEl.classList.remove("hidden");
+
         setTimeout(() => input.classList.remove("error"), 600);
       }
     }
