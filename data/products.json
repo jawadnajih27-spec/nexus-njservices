@@ -25,9 +25,20 @@
     "name": "Landing factory",
     "type": "digital",
     "price": 25,
-    "description": "باسم الله تعالى",
+    "description": "Ø¨Ø§Ø³Ù Ø§ÙÙÙ ØªØ¹Ø§ÙÙ",
     "imageUrl": "",
     "createdAt": "2026-03-30T21:27:20.234Z",
+    "downloadUrl": "263e2735216c666c2b3627273c742f262c2e372f365155411b382f2126373a67223523",
+    "stock": null
+  },
+  {
+    "id": "prod_mndpa5o2ym3gc",
+    "name": "Landing factory",
+    "type": "digital",
+    "price": 25,
+    "description": "Making unlimited landing pages",
+    "imageUrl": "https://res.cloudinary.com/dztczxekd/image/upload/v1774906126/alsn97mad73q0lo3wywm.jpg",
+    "createdAt": "2026-03-30T21:28:48.434Z",
     "downloadUrl": "263e2735216c666c2b3627273c742f262c2e372f365155411b382f2126373a67223523",
     "stock": null
   }
