@@ -627,9 +627,13 @@ return url;
     // ─────────────────────────────────────────────
     function checkAuth() {
       const errorEl = document.getElementById("auth-error");
-      const pw = input.value;
+      const input = document.getElementById("auth-password"); 
 
-            errorEl.classList.add("hidden");
+const pw = input.value.trim();
+
+            errorEl.classList.add("hidden"); 
+
+input.classList.remove("error");
 
       if (!window.ROYAL_CONFIG || !ROYAL_CONFIG.manager) {
         errorEl.textContent = "Configuration error: ROYAL_CONFIG is missing.";
