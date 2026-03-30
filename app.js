@@ -25,7 +25,7 @@ async function fetchProducts() {
     });
 
     if (!res.ok) {
-   let details = res.statusText;
+      let details = res.statusText;
 
       try {
         const errData = await res.json();
@@ -33,6 +33,17 @@ async function fetchProducts() {
       } catch (_) {
         // Keep fallback status text when body isn't JSON.
       }
+
+      // If products.json does not exist yet, allow first-time bootstrap. 
+
+if (res.status === 404) { 
+
+console.warn("[RoyalNexus] products file not found on GitHub. Initializing empty catalog."); 
+return { 
+products: [], 
+sha: null, 
+}; 
+} 
 
       throw new Error(`GitHub GET failed: ${res.status} — ${details}`);
     }
@@ -70,9 +81,12 @@ async function saveProducts(products, sha, message = "Update products via Royal 
   const body = {
     message,
     content,
-    sha,       // ← Must match current file SHA or GitHub returns 409 Conflict
     branch: ROYAL_CONFIG.github.branch,
   };
+if (sha) { 
+// Must match current file SHA or GitHub returns 409 Conflict. 
+body.sha = sha; 
+}
 
   try {
     const res = await fetch(url, {
