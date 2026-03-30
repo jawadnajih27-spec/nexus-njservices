@@ -806,6 +806,11 @@ errorEl.classList.remove("hidden");
       label.innerHTML = `<span class="spinner"></span> Uploading…`;
 
       try {
+        // Fail fast before uploading image when GitHub config is invalid. 
+if (typeof validateGitHubConfig === "function") { 
+validateGitHubConfig(); 
+} 
+
         // Upload image to Cloudinary (if selected)
         let imageUrl = "";
         if (selectedImageFile) {
