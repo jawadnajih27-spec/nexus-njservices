@@ -27,7 +27,7 @@ const ROYAL_CONFIG = {
     owner: "jawadnajih27-spec",
 
     // Repository name where products.json lives
-    repo: "royal-nexus-store",
+    repo: "nexus-njservices",
 
     // Branch to read/write from
     branch: "main",
