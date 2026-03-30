@@ -21,7 +21,7 @@ const ROYAL_CONFIG = {
     // Your GitHub Personal Access Token (Classic)
     // Permissions needed: repo → contents (read & write)
     // Format: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    pat: "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",
+    pat: "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",
 
     // GitHub username / org that owns the repo
     owner: "jawadnajih27-spec",
