@@ -21,7 +21,7 @@ const ROYAL_CONFIG = {
     // Your GitHub Personal Access Token (Classic)
     // Permissions needed: repo → contents (read & write)
     // Format: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    pat: "ghp_YOUR_TOKEN_HERE",
+    pat: "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",
 
     // GitHub username / org that owns the repo
     owner: "jawadnajih27-spec",
@@ -57,7 +57,7 @@ const ROYAL_CONFIG = {
   // 🖼️  CLOUDINARY CONFIGURATION (Image Hosting)
   // ──────────────────────────────────────────────
   cloudinary: {
-    cloudName: "YOUR_CLOUD_NAME",
+    cloudName: "dztczxekd",
     uploadPreset: "royal_nexus_unsigned", // Create an "unsigned" upload preset in Cloudinary dashboard
     get uploadUrl() {
       return `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
@@ -70,7 +70,7 @@ const ROYAL_CONFIG = {
   manager: {
     // Simple access password for manager.html
     // For production, replace with a proper auth system
-    accessPassword: "njservices2025",
+    accessPassword: "njservices25",
   },
 
   // ──────────────────────────────────────────────
