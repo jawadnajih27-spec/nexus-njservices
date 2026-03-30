@@ -101,18 +101,31 @@ const ROYAL_CONFIG = {
 // Always uses "token" prefix (required for Classic PAT)
 // ──────────────────────────────────────────────────────────
 function getGitHubHeaders() {
-  return {
-    "Authorization": `token ${ROYAL_CONFIG.github.pat}`,
+  const headers = {
     "Accept": "application/vnd.github+json",
     "Content-Type": "application/json",
   };
-}
+
+  const pat = (ROYAL_CONFIG.github.pat || "").trim();
+
+  // Support both classic and fine-grained tokens; avoid sending empty auth header.
+  if (pat) {
+    headers["Authorization"] = pat.startsWith("github_pat_") ? `Bearer ${pat}` : `token ${pat}`;
+  }
+
+  return headers;
 
 // ──────────────────────────────────────────────────────────
 // Helper: Build GitHub Contents API URL
 // ──────────────────────────────────────────────────────────
-function getGitHubUrl(path) {
+function getGitHubUrl(path, options = {}) {
   const { owner, repo } = ROYAL_CONFIG.github;
+  const normalizedPath = String(path || "").replace(/^\/+/, "");
+  const url = new URL(`https://api.github.com/repos/${owner}/${repo}/contents/${normalizedPath}`);
+  
+  if (options.ref) {
+    url.searchParams.set("ref", options.ref);
+  }
   // No trailing slash — common source of 404 errors
-  return `https://api.github.com/repos/${owner}/${repo}/contents/${path}`;
+  return url.toString();
 }
