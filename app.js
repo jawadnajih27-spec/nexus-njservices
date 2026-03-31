@@ -243,6 +243,52 @@ async function uploadImage(file) {
   return data.secure_url;
 }
 
+/** 
+* Upload a digital ZIP file to the configured GitHub repository. 
+* Returns a direct download URL that can be stored (obfuscated) with the product. 
+* 
+* @param {File} file - ZIP file from <input type="file"> 
+* @returns {Promise<string>} Direct public URL to the uploaded ZIP file 
+*/ 
+async function uploadDigitalZip(file) { 
+validateGitHubConfig(); 
+if (!file) throw new Error("ZIP file is missing"); 
+if (!/\.zip$/i.test(file.name)) throw new Error("Only .zip files are supported"); 
+const basePath = (ROYAL_CONFIG.github.digitalProductsPath || "data/digital-products").replace(/^\/+|\/+$/g, ""); 
+const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_"); 
+const targetPath = `${basePath}/${Date.now()}-${safeName}`; 
+const arrayBuffer = await file.arrayBuffer(); 
+const bytes = new Uint8Array(arrayBuffer); 
+let binary = ""; 
+const chunkSize = 0x8000; 
+for (let i = 0; i < bytes.length; i += chunkSize) { 
+binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize)); 
+} 
+const content = btoa(binary); 
+const uploadUrl = getGitHubUrl(targetPath); 
+const res = await fetch(uploadUrl, { 
+method: "PUT", 
+headers: getGitHubHeaders(), 
+body: JSON.stringify({ 
+message: `Upload digital product file: ${safeName}`, 
+content, 
+branch: ROYAL_CONFIG.github.branch, 
+}), 
+}); 
+if (!res.ok) { 
+let details = res.statusText; 
+try { 
+const errData = await res.json(); 
+details = errData.message || details; 
+} catch (_) { 
+// Keep fallback status text when body isn't JSON. 
+} 
+throw new Error(`ZIP upload failed: ${res.status} — ${details}`); 
+} 
+const { owner, repo, branch } = ROYAL_CONFIG.github; 
+return `https://raw.githubusercontent.com/${owner}/${repo}/${encodeURIComponent(branch)}/${targetPath}`; 
+} 
+
 // ════════════════════════════════════════════════════════════
 // SECTION 3: SECURITY — DOWNLOAD LINK OBFUSCATION
 // ════════════════════════════════════════════════════════════
