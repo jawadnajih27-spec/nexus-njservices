@@ -441,12 +441,18 @@
               </div>
             </div>
 
-            <!-- Download URL (digital only) -->
+            <!-- Digital ZIP Upload (digital only) -->
             <div id="f-download-wrap">
-              <label class="field-label">Download URL *
-                <span class="text-royal/60 normal-case font-normal tracking-normal ml-1">(will be obfuscated)</span>
+              <label class="field-label">Digital ZIP File *</label> 
+<input type="file" id="f-download-file" class="field-input" accept=".zip,application/zip,application/x-zip-compressed" />
+<p class="text-xs text-muted mt-1"> 
+Upload the ZIP file now. It will be stored in your GitHub repo and delivered after successful PayPal payment. 
+</p> 
+<label class="field-label mt-3">Or External Download URL 
+<span class="text-royal/60 normal-case font-normal tracking-normal ml-1">(optional fallback, will be obfuscated)</span>
+
               </label>
-              <input type="url" id="f-download-url" class="field-input" placeholder="https://drive.google.com/…" />
+              <input type="url" id="f-download-url" class="field-input" placeholder="https://example.com/your-file.zip" />
               <p class="text-xs text-muted mt-1">
                 ℹ️ This URL is stored obfuscated using XOR encoding. It's not encryption — use private links.
               </p>
@@ -523,6 +529,8 @@ branch: "main",
 
 productsPath: "data/products.json", 
 
+  digitalProductsPath: "data/digital-products",
+  
 }, 
 
 paypal: { 
@@ -794,11 +802,15 @@ errorEl.classList.remove("hidden");
       const price = parseFloat(document.getElementById("f-price").value);
       const description = document.getElementById("f-description").value.trim();
       const downloadUrlRaw = type === "digital" ? document.getElementById("f-download-url").value.trim() : "";
-
+const zipFile = type === "digital" ? document.getElementById("f-download-file").files[0] : null;
+      
       // Basic validation
       if (!name) { showToast("Product name is required", "error"); return; }
       if (isNaN(price) || price < 0) { showToast("Enter a valid price", "error"); return; }
-      if (type === "digital" && !downloadUrlRaw) { showToast("Download URL is required for digital products", "error"); return; }
+      if (type === "digital" && !zipFile && !downloadUrlRaw) { 
+showToast("Upload a ZIP file or provide a download URL for digital products", "error"); 
+return; 
+}
 
       const btn = document.getElementById("submit-btn");
       const label = document.getElementById("submit-label");
@@ -817,6 +829,11 @@ validateGitHubConfig();
           imageUrl = await uploadImage(selectedImageFile);
         }
 
+        let finalDownloadUrl = downloadUrlRaw; 
+if (type === "digital" && zipFile) { 
+label.innerHTML = `<span class="spinner"></span> Uploading ZIP file…`; 
+finalDownloadUrl = await uploadDigitalZip(zipFile); 
+} 
         // Build product object
         const product = {
           id: generateId(),
@@ -827,7 +844,7 @@ validateGitHubConfig();
           imageUrl,
           createdAt: new Date().toISOString(),
           // Obfuscate download URL before storing
-          downloadUrl: downloadUrlRaw ? encodeDownloadUrl(downloadUrlRaw) : "",
+          downloadUrl: finalDownloadUrl ? encodeDownloadUrl(finalDownloadUrl) : "",
           stock: type === "physical" ? parseInt(document.getElementById("f-stock").value || "0") : null,
         };
 
@@ -841,6 +858,9 @@ validateGitHubConfig();
           const el = document.getElementById(id);
           if (el) el.value = "";
         });
+        const zipInput = document.getElementById("f-download-file"); 
+if (zipInput) zipInput.value = "";
+
         document.getElementById("image-preview").classList.add("hidden");
         selectedImageFile = null;
 
