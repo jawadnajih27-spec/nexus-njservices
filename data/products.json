@@ -19,5 +19,16 @@
     "downloadUrl": "",
     "stock": 50,
     "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "prod_mnebgdg0wkgt9",
+    "name": "Landing factory",
+    "type": "digital",
+    "price": 30,
+    "description": "​💎 Brand Name: The Landing Factory Elite ​Crafted by NJSERVICES Atelier ​📌 Short Description: \n\n​\"Don't just own a website; own a high-conversion sales machine. Landing Factory is the ultimate solution for marketers and businesses seeking elite performance and a royal design that captures attention in seconds.\"\n\n​🚀 The Tech Stack: ​Performance: Ultra-fast loading speeds (100/100 Score) to ensure you never lose a lead. ​Design: Modern UI featuring the signature NJSERVICES (Dark & Gold) luxury aesthetic. ​Animations: Seamless, fluid motion using GSAP and Framer Motion to wow your visitors. ​Clean Code: Written with Tailwind CSS—fully optimized, SEO-friendly, and easy to customize. ​Responsive: Pixel-perfect adaptability across all devices, from mobile to ultra-wide monitors. ​📦 What’s Included: ​Full Source Code: Complete (HTML/JS/CSS) files, ready for instant deployment. ​Mini Admin Dashboard: Effortlessly update text and images without touching a single line of code. ​Deployment Guide: A simple, step-by-step manual to launch on Vercel or GitHub in under 2 minutes. ​Premium Support: Direct access to our agency’s developers for any technical inquiries. ​💡 Why Choose \"Landing Factory\"? \n\n​In the world of E-commerce, every second is money. At NJSERVICES, we engineered this product to be the lightest and fastest on the market, focusing on sales psychology in every pixel. This isn't just a template; it's a strategic investment in your business growth.\n\n​💳 Strategic Pricing: ​Regular Price: $99.00 ​Exclusive Launch Offer: $49.00",
+    "imageUrl": "https://res.cloudinary.com/dztczxekd/image/upload/v1774943370/fzckbifgjmicu2gtzlvd.jpg",
+    "createdAt": "2026-03-31T07:49:30.001Z",
+    "downloadUrl": "263e2735216c666c2f3228332b3720263623776e7241405756602d3a313a232b6d2c3c703e2e372525312c683f3e51445d473765",
+    "stock": null
   }
 ]
