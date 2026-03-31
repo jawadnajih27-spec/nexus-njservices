@@ -34,6 +34,9 @@ const ROYAL_CONFIG = {
 
     // Path to the products data file inside the repo
     productsPath: "data/products.json",
+  
+// Path (folder) where digital ZIP files are uploaded 
+digitalProductsPath: "data/digital-products",
   },
 
   // ──────────────────────────────────────────────
