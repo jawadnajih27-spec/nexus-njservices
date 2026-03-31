@@ -45,7 +45,7 @@ digitalProductsPath: "data/digital-products",
   paypal: {
     // Your PayPal REST App Client ID
     // Get it from: https://developer.paypal.com/dashboard/applications
-    clientId: "YOUR_PAYPAL_CLIENT_ID_HERE",
+    clientId: "PP-L-468742829151",
 
     // Currency for all transactions
     currency: "USD",
