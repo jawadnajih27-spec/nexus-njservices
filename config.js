@@ -52,7 +52,9 @@ digitalProductsPath: "data/digital-products",
 
     // PayPal SDK URL (auto-injects clientId & currency)
     get sdkUrl() {
-      return `https://www.paypal.com/sdk/js?client-id=${this.clientId}&currency=${this.currency}`;
+   const clientId = (this.clientId || "").trim();
+      const safeClientId = clientId && !clientId.includes("@") ? clientId : "sb";
+      return `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(safeClientId)}&currency=${encodeURIComponent(this.currency)}&intent=capture&components=buttons`;   
     },
   },
 
