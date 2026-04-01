@@ -430,7 +430,13 @@ function loadPayPalSDK() {
  * @param {Function} onSuccess - Callback(decodedDownloadUrl) after payment
  */
 function renderPayPalButton(containerId, product, onSuccess) {
-  paypal.Buttons({
+  const container = document.getElementById(containerId); 
+if (!container) return; 
+if (!window.paypal || typeof window.paypal.Buttons !== "function") { 
+container.innerHTML = `<p style="color:#8B0000;font-size:13px;">PayPal failed to load. Please refresh the page and try again.</p>`; 
+return; 
+} 
+const buttons = paypal.Buttons({
 
     style: {
       layout: "vertical",
@@ -493,9 +499,16 @@ function renderPayPalButton(containerId, product, onSuccess) {
     onError: (err) => {
       console.error("[RoyalNexus] PayPal button error:", err);
     },
-
-  }).render(`#${containerId}`);
-}
+container.innerHTML = `<p style="color:#8B0000;font-size:13px;">Unable to show PayPal checkout. Please try again.</p>`;
+}); 
+if (typeof buttons.isEligible === "function" && !buttons.isEligible()) { 
+container.innerHTML = `<p style="color:#8B0000;font-size:13px;">PayPal is not available for this account/device.</p>`; 
+return; 
+} 
+buttons.render(`#${containerId}`).catch((err) => { 
+console.error("[RoyalNexus] PayPal render error:", err); 
+container.innerHTML = `<p style="color:#8B0000;font-size:13px;">Unable to render PayPal button. Please verify PayPal client ID.</p>`; 
+});
 
 // ════════════════════════════════════════════════════════════
 // SECTION 5: UTILITY HELPERS
