@@ -398,7 +398,7 @@
         <div class="glass-panel max-w-xl">
           <h2 class="font-display text-xl font-semibold mb-6">Add New Product</h2>
 
-          <div class="grid gap-4">
+          <form id="add-product-form" class="grid gap-4">
             <!-- Name -->
             <div>
               <label class="field-label">Product Name *</label>
@@ -466,11 +466,11 @@ Upload the ZIP file now. It will be stored in your GitHub repo and delivered aft
 
             <!-- Submit -->
             <div class="pt-2">
-   <button type="button" id="submit-btn" onclick="submitProduct()" class="btn-primary w-full justify-center" style="display:flex; gap:8px;">
+   <button type="submit" id="submit-btn" class="btn-primary w-full justify-center" style="display:flex; gap:8px;">
                 <span id="submit-label">Add Product to Store</span>
               </button>
             </div>
-          </div>
+          </form>
         </div>
       </section>
 
@@ -797,7 +797,8 @@ errorEl.classList.remove("hidden");
       reader.readAsDataURL(file);
     }
 
-    async function submitProduct() {
+    async function submitProduct(e) {
+if (e) e.preventDefault();
       const name = document.getElementById("f-name").value.trim();
       const type = document.getElementById("f-type").value;
       const price = parseFloat(document.getElementById("f-price").value);
@@ -876,6 +877,12 @@ if (zipInput) zipInput.value = "";
       }
     }
 
+    function bindAddProductForm() {
+const form = document.getElementById("add-product-form"); 
+if (!form) return; 
+form.addEventListener("submit", submitProduct); 
+}
+
     // ─────────────────────────────────────────────
     // DELETE PRODUCT
     // ─────────────────────────────────────────────
@@ -920,6 +927,8 @@ if (zipInput) zipInput.value = "";
         showToast("Export failed: " + err.message, "error");
       }
     }
+    
+    bindAddProductForm();
   </script>
 </body>
 </html>
