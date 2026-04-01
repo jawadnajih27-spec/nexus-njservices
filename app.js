@@ -15,7 +15,7 @@
  * The SHA is required for any subsequent PUT (update) operation.
  */
 async function fetchProducts() {
-  validateGitHubConfig(); 
+  validateGitHubConfig({ requirePat: false });
 
   const url = getGitHubUrl(ROYAL_CONFIG.github.productsPath, {
     ref: ROYAL_CONFIG.github.branch,
@@ -93,7 +93,7 @@ sha: null,
  * @param {string} message   - Git commit message
  */
 async function saveProducts(products, sha, message = "Update products via Royal Nexus Manager") {
-validateGitHubConfig(); 
+validateGitHubConfig({ requirePat: true });
   
   const url = getGitHubUrl(ROYAL_CONFIG.github.productsPath);
 
@@ -251,7 +251,7 @@ async function uploadImage(file) {
 * @returns {Promise<string>} Direct public URL to the uploaded ZIP file 
 */ 
 async function uploadDigitalZip(file) { 
-validateGitHubConfig(); 
+validateGitHubConfig({ requirePat: true });
 if (!file) throw new Error("ZIP file is missing"); 
 if (!/\.zip$/i.test(file.name)) throw new Error("Only .zip files are supported"); 
 const basePath = (ROYAL_CONFIG.github.digitalProductsPath || "data/digital-products").replace(/^\/+|\/+$/g, ""); 
@@ -343,7 +343,8 @@ function decodeDownloadUrl(hex) {
 
 let githubRepoAccessCache = null;
 
-function validateGitHubConfig() {
+function validateGitHubConfig(options = {}) { 
+const { requirePat = true } = options;
   const github = ROYAL_CONFIG?.github || {};
   const missing = [];
 
@@ -354,9 +355,8 @@ function validateGitHubConfig() {
 
   if (missing.length) {
     throw new Error(`GitHub configuration is incomplete. Missing: ${missing.join(", ")}`);
-  }
 
-  if (!String(github.pat || "").trim()) {
+    if (requirePat && !String(github.pat || "").trim()) {
     throw new Error("GitHub PAT is missing. Add github.pat in config.js before adding products.");
   }
 }
