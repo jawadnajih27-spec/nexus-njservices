@@ -134,3 +134,11 @@ function getGitHubUrl(path, options = {}) {
   // No trailing slash — common source of 404 errors
   return url.toString();
 }
+
+// Expose config/helpers on window so manager.html can detect and reuse 
+// config.js instead of falling back to its built-in emergency defaults. 
+if (typeof window !== "undefined") { 
+window.ROYAL_CONFIG = ROYAL_CONFIG; 
+window.getGitHubHeaders = getGitHubHeaders; 
+window.getGitHubUrl = getGitHubUrl; 
+}
