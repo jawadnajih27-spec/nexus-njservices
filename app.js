@@ -355,8 +355,9 @@ const { requirePat = true } = options;
 
   if (missing.length) {
     throw new Error(`GitHub configuration is incomplete. Missing: ${missing.join(", ")}`);
+  }
 
-    if (requirePat && !String(github.pat || "").trim()) {
+  if (requirePat && !String(github.pat || "").trim()) {
     throw new Error("GitHub PAT is missing. Add github.pat in config.js before adding products.");
   }
 }
@@ -498,9 +499,9 @@ const buttons = paypal.Buttons({
 
     onError: (err) => {
       console.error("[RoyalNexus] PayPal button error:", err);
+      container.innerHTML = `<p style="color:#8B0000;font-size:13px;">Unable to show PayPal checkout. Please try again.</p>`;
     },
-container.innerHTML = `<p style="color:#8B0000;font-size:13px;">Unable to show PayPal checkout. Please try again.</p>`;
-}); 
+  }); 
 if (typeof buttons.isEligible === "function" && !buttons.isEligible()) { 
 container.innerHTML = `<p style="color:#8B0000;font-size:13px;">PayPal is not available for this account/device.</p>`; 
 return; 
@@ -509,6 +510,7 @@ buttons.render(`#${containerId}`).catch((err) => {
 console.error("[RoyalNexus] PayPal render error:", err); 
 container.innerHTML = `<p style="color:#8B0000;font-size:13px;">Unable to render PayPal button. Please verify PayPal client ID.</p>`; 
 });
+}
 
 // ════════════════════════════════════════════════════════════
 // SECTION 5: UTILITY HELPERS
