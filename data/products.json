@@ -19,16 +19,5 @@
     "downloadUrl": "",
     "stock": 50,
     "createdAt": "2025-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "prod_mnem2io77e7ze",
-    "name": "عطر",
-    "type": "physical",
-    "price": 100,
-    "description": "....",
-    "imageUrl": "https://res.cloudinary.com/dztczxekd/image/upload/v1774961198/abwaohtt0hlrcvviitpg.jpg",
-    "createdAt": "2026-03-31T12:46:39.367Z",
-    "downloadUrl": "",
-    "stock": 0
   }
 ]
