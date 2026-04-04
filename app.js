@@ -465,36 +465,27 @@ const buttons = paypal.Buttons({
     },
 
     // Called when buyer approves the payment
-    onApprove: async (data, actions) => {
-      try {
-        // Capture the funds
-        const order = await actions.order.capture();
-
+    onApprove: (data, actions) => {
+      return actions.order.capture().then(function(order) {
         if (order.status === "COMPLETED") {
           if (product.type === "digital") {
-            // Decode the hidden download URL and reveal it immediately
-            const downloadUrl = decodeDownloadUrl(product.downloadUrl);
-
-            // Pass to the calling page's success handler
-            onSuccess({
-              product,
-              downloadUrl,
-              orderId: order.id,
-              payer: order.payer,
-            });
-          } else {
-            // Physical product → redirect to WhatsApp with order details
-            const msg = encodeURIComponent(
-              `✅ Order Confirmed!\nProduct: ${product.name}\nOrder ID: ${order.id}\nPlease confirm shipping details.`
-            );
-            window.open(`https://wa.me/${ROYAL_CONFIG.store.whatsapp}?text=${msg}`, "_blank");
-            onSuccess({ product, orderId: order.id, payer: order.payer, isPhysical: true });
+            window.location.href = "success.html#product=" + encodeURIComponent(product.name) + "&orderId=" + order.id + "&dl=" + product.downloadUrl;
+            return;
           }
+
+          // Physical product → redirect to WhatsApp with order details
+          const msg = encodeURIComponent(
+            `✅ Order Confirmed!\nProduct: ${product.name}\nOrder ID: ${order.id}\nPlease confirm shipping details.`
+          );
+          window.open(`https://wa.me/${ROYAL_CONFIG.store.whatsapp}?text=${msg}`, "_blank");
+          onSuccess({ product, orderId: order.id, payer: order.payer, isPhysical: true });
         }
-      } catch (err) {
+      }).catch((err) => {
         console.error("[RoyalNexus] Payment capture error:", err);
-        alert("Payment failed. Please try again or contact support.");
-      }
+        if (product.type !== "digital") {
+          alert("Payment failed. Please try again or contact support.");
+        }
+      });
     },
 
     onError: (err) => {
