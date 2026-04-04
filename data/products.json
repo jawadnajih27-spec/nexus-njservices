@@ -19,16 +19,5 @@
     "downloadUrl": "",
     "stock": 50,
     "createdAt": "2025-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "prod_mnk9gqnf6t5hq",
-    "name": "Landing factory",
-    "type": "digital",
-    "price": 25,
-    "description": "Make unlimited landing pages",
-    "imageUrl": "https://res.cloudinary.com/dztczxekd/image/upload/v1775302818/nqucbace6b0mbnuqzrrj.jpg",
-    "createdAt": "2026-04-04T11:40:24.939Z",
-    "downloadUrl": "263e2735216c666c3732287c283035242a29302a3a40535d5b3a2f3d317c35262e6a393e252e3d2f2d35222d6b681f4342502d653d202a233a6e2b392c373d2f282f3a386a343e5b5e1d512f3e326a363f2e2a3132337f3f2b2e282a28312a70030705007d7a617d636e7f727d7e39332c2d2e3e2666336a71485942",
-    "stock": null
   }
 ]
