@@ -19,5 +19,16 @@
     "downloadUrl": "",
     "stock": 50,
     "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "prod_mnogml1dafizx",
+    "name": "Landing factory v1.0",
+    "type": "digital",
+    "price": 15,
+    "description": "Make a professional landing pages for free and unlimited \nWith landing factory first version",
+    "imageUrl": "https://res.cloudinary.com/dztczxekd/image/upload/v1775556716/hda3ylse4ebmxl44gdrs.png",
+    "createdAt": "2026-04-07T10:11:59.617Z",
+    "downloadUrl": "263e2735216c666c3732287c283035242a29302a3a40535d5b3a2f3d317c35262e6a393e252e3d2f2d35222d6b681f4342502d653d202a233a6e2b392c373d2f282f3a386a343e5b5e1d512f3e326a363f2e2a3132337f3f2b2e282a28312a70030705007b7f657263617c777c7e3333213d2822386623383c465f404c6327322c3c78332a35",
+    "stock": null
   }
 ]
