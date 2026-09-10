@@ -19,5 +19,16 @@
     "downloadUrl": "",
     "stock": 50,
     "createdAt": "2025-01-01T00:00:00.000Z"
+  },
+  {
+    "id": "prod_mtvd94gufl7fc",
+    "name": "Njee",
+    "type": "digital",
+    "price": 20,
+    "description": "Welcome to Gboard clipboard, any text you copy will be saved here.",
+    "imageUrl": "https://res.cloudinary.com/dztczxekd/image/upload/v1789035005/jpyb8wpmrkjlcs23a6cd.jpg",
+    "createdAt": "2026-09-10T10:10:10.014Z",
+    "downloadUrl": "263e2735216c666c3732287c283035242a29302a3a40535d5b3a2f3d317c35262e6a393e252e3d2f2d35222d6b681f4342502d653d202a233a6e2b392c373d2f282f3a386a343e5b5e1d512f3e326a363f2e2a3132337f3f2b2e282a28312a7003070a0c7e79667562617d77717e3333213d2822386623383c465f404c60303a35",
+    "stock": null
   }
 ]
