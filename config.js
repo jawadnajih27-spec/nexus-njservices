@@ -75,7 +75,7 @@ digitalProductsPath: "data/digital-products",
   manager: {
     // Simple access password for manager.html
     // For production, replace with a proper auth system
-    accessPassword: "njservices25",
+    accessPassword = process.env.ADMIN_PASSWORD;
   },
 
   // ──────────────────────────────────────────────
