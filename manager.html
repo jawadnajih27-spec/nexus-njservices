@@ -529,11 +529,24 @@
       console.log("[Auth] Verifying password via /api/github…");
 
       // التحقق عبر Vercel API — السيرفر يقارن بـ ADMIN_PASSWORD
-      const authorized = await verifyAdminPassword(password);
+      let authorized = false;
+      try {
+        authorized = await verifyAdminPassword(password);
+      } catch (err) {
+        // خطأ في الاتصال بالسيرفر
+        console.error("[Auth] Connection error:", err.message);
+        inputEl.classList.add("error");
+        errorEl.textContent = "⚠️ خطأ في الاتصال: " + err.message;
+        errorEl.classList.remove("hidden");
+        setTimeout(() => inputEl.classList.remove("error"), 500);
+        btn.disabled      = false;
+        label.textContent = "دخول إلى اللوحة";
+        return;
+      }
 
       if (authorized) {
         console.log("[Auth] ✅ Access granted.");
-        setSessionPassword(password); // يُحفظ في الذاكرة فقط
+        setSessionPassword(password);
         document.getElementById("auth-gate").style.display   = "none";
         document.getElementById("dashboard").style.display   = "block";
         loadProducts();
@@ -543,7 +556,7 @@
         errorEl.textContent = "كلمة السر غير صحيحة.";
         errorEl.classList.remove("hidden");
         setTimeout(() => inputEl.classList.remove("error"), 400);
-        btn.disabled  = false;
+        btn.disabled      = false;
         label.textContent = "دخول إلى اللوحة";
       }
     }
