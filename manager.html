@@ -1,30 +1,29 @@
 <!DOCTYPE html>
-<html lang="en" dir="ltr">
+<html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Manager Dashboard — Royal Nexus</title>
+  <title>لوحة التحكم — Royal Nexus</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
-
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Tajawal:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            cream: "#FDFDFD",
-            crimson: { DEFAULT: "#8B0000", light: "#C41E3A", soft: "#F5E6E8" },
-            royal: { DEFAULT: "#4B0082", light: "#7B2FBE", soft: "#EDE9F5" },
-            ink: "#1A1A2E",
-            muted: "#6B7280",
-            panel: "#F8F7FF",
+            cream:   "#FDFDFD",
+            gold:    { DEFAULT: "#C9A84C", light: "#E8C96A", dark: "#A07830" },
+            royal:   { DEFAULT: "#4B0082", light: "#7B2FBE", soft: "#EDE9F5" },
+            crimson: { DEFAULT: "#8B0000", light: "#C41E3A" },
+            ink:     "#1A1A2E",
+            muted:   "#6B7280",
+            panel:   "#F8F7FF",
           },
           fontFamily: {
             display: ["Cormorant Garamond", "serif"],
-            body: ["DM Sans", "sans-serif"],
+            body:    ["Tajawal", "sans-serif"],
           },
         },
       },
@@ -33,651 +32,538 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: "DM Sans", sans-serif;
-      background: #F8F7FF;
-      color: #1A1A2E;
-      min-height: 100vh;
-    }
+    body { font-family: "Tajawal", sans-serif; background: #F8F7FF; color: #1A1A2E; min-height: 100vh; }
 
-    /* ── Auth Gate ────────────────────────────────── */
+    /* ── Auth Gate ────────────────── */
     #auth-gate {
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% -20%, rgba(75,0,130,0.12) 0%, transparent 70%),
-        #F8F7FF;
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(75,0,130,0.12) 0%, transparent 70%), #F8F7FF;
     }
     .auth-card {
-      background: rgba(255,255,255,0.9);
-      border: 1px solid rgba(75,0,130,0.12);
-      backdrop-filter: blur(20px);
-      border-radius: 20px;
-      padding: 40px 36px;
-      width: min(380px, 90vw);
-      box-shadow: 0 16px 60px rgba(75,0,130,0.1);
+      background: rgba(255,255,255,0.92); border: 1px solid rgba(75,0,130,0.12);
+      backdrop-filter: blur(20px); border-radius: 20px; padding: 44px 36px;
+      width: min(400px, 92vw);
+      box-shadow: 0 16px 60px rgba(75,0,130,0.1), 0 2px 8px rgba(139,0,0,0.06);
     }
-    .auth-card input {
-      width: 100%; padding: 12px 16px;
-      border: 1px solid rgba(75,0,130,0.2);
-      border-radius: 10px; font-size: 14px;
-      background: rgba(255,255,255,0.8);
-      transition: border-color 0.2s;
-      outline: none; font-family: "DM Sans", sans-serif;
+
+    /* ── Field ────────────────────── */
+    .field-label {
+      display: block; font-size: 11px; font-weight: 700;
+      letter-spacing: 0.06em; text-transform: uppercase; color: #6B7280; margin-bottom: 6px;
     }
-    .auth-card input:focus { border-color: #4B0082; }
-    .auth-card input.error { border-color: #C41E3A; animation: shake 0.3s ease; }
+    .field-input {
+      width: 100%; padding: 11px 14px; border: 1px solid rgba(75,0,130,0.18);
+      border-radius: 10px; font-size: 14px; background: rgba(255,255,255,0.9);
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+      font-family: "Tajawal", sans-serif; color: #1A1A2E; direction: ltr;
+    }
+    .field-input:focus { border-color: #4B0082; box-shadow: 0 0 0 3px rgba(75,0,130,0.08); }
+    .field-input.error { border-color: #C41E3A; animation: shake 0.35s ease; }
+    textarea.field-input { resize: vertical; min-height: 80px; direction: rtl; }
+    select.field-input { cursor: pointer; direction: rtl; }
+
     @keyframes shake {
       0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-8px); }
-      75% { transform: translateX(8px); }
+      25%       { transform: translateX(-6px); }
+      75%       { transform: translateX(6px); }
     }
 
-    /* ── Dashboard Layout ─────────────────────────── */
-    #dashboard { display: none; }
+    /* ── Buttons ──────────────────── */
+    .btn-primary {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 12px 28px; border-radius: 10px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #4B0082, #7B2FBE); color: #FDFDFD;
+      font-family: "Tajawal", sans-serif; font-size: 14px; font-weight: 600;
+      box-shadow: 0 4px 16px rgba(75,0,130,0.3); transition: all 0.25s;
+      width: 100%;
+    }
+    .btn-primary:hover:not(:disabled) { box-shadow: 0 6px 24px rgba(75,0,130,0.4); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn-danger { background: none; border: 1px solid rgba(139,0,0,0.3); color: #8B0000; padding: 6px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: all 0.2s; font-family: "Tajawal", sans-serif; }
+    .btn-danger:hover { background: rgba(139,0,0,0.07); }
+    .btn-ghost { background: transparent; border: 1px solid rgba(75,0,130,0.2); color: #4B0082; padding: 7px 16px; border-radius: 8px; font-size: 13px; cursor: pointer; transition: all 0.2s; font-family: "Tajawal", sans-serif; }
+    .btn-ghost:hover { background: rgba(75,0,130,0.06); }
 
+    /* ── Sidebar ──────────────────── */
+    #dashboard { display: none; }
     .dash-sidebar {
-      position: fixed; top: 0; left: 0;
-      width: 240px; height: 100vh;
+      position: fixed; top: 0; right: 0; width: 230px; height: 100vh;
       background: linear-gradient(180deg, #1A1A2E 0%, #0D0D1A 100%);
-      border-right: 1px solid rgba(255,255,255,0.06);
-      z-index: 50; overflow-y: auto;
+      border-left: 1px solid rgba(255,255,255,0.05); z-index: 50; overflow-y: auto;
       transition: transform 0.3s ease;
     }
     @media (max-width: 768px) {
-      .dash-sidebar { transform: translateX(-100%); }
+      .dash-sidebar { transform: translateX(100%); }
       .dash-sidebar.open { transform: translateX(0); }
-      .dash-main { margin-left: 0 !important; }
+      .dash-main { margin-right: 0 !important; }
     }
 
     .nav-item {
-      display: flex; align-items: center; gap: 12px;
-      padding: 11px 20px; border-radius: 10px;
-      font-size: 13px; font-weight: 500; cursor: pointer;
-      transition: all 0.2s ease; color: rgba(255,255,255,0.5);
+      display: flex; align-items: center; gap: 10px; padding: 11px 18px;
+      border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer;
+      transition: all 0.2s ease; color: rgba(255,255,255,0.45);
       margin: 2px 0; text-decoration: none;
     }
-    .nav-item:hover { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); }
+    .nav-item:hover  { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.8); }
     .nav-item.active {
-      background: linear-gradient(135deg, rgba(139,0,0,0.3), rgba(75,0,130,0.25));
-      color: #FDFDFD;
-      border: 1px solid rgba(196,30,58,0.2);
+      background: linear-gradient(135deg, rgba(139,0,0,0.28), rgba(75,0,130,0.22));
+      color: #FDFDFD; border: 1px solid rgba(201,168,76,0.15);
     }
-    .nav-item svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .nav-item svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-    .dash-main {
-      margin-left: 240px;
-      min-height: 100vh;
-      padding: 28px 24px;
+    .dash-main { margin-right: 230px; min-height: 100vh; padding: 28px 22px; }
+
+    /* ── Cards ────────────────────── */
+    .glass-panel {
+      background: rgba(255,255,255,0.78); backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.92); border-radius: 16px;
+      box-shadow: 0 4px 20px rgba(75,0,130,0.07); padding: 24px;
     }
-
-    /* ── Top Bar ──────────────────────────────────── */
-    .top-bar {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 28px; padding-bottom: 20px;
-      border-bottom: 1px solid rgba(75,0,130,0.08);
-    }
-
-    /* ── Stat Cards ───────────────────────────────── */
     .stat-card {
-      background: rgba(255,255,255,0.8);
-      border: 1px solid rgba(255,255,255,0.95);
+      background: rgba(255,255,255,0.82); border: 1px solid rgba(255,255,255,0.95);
       border-radius: 14px; padding: 20px;
       box-shadow: 0 2px 12px rgba(75,0,130,0.06);
     }
 
-    /* ── Glass Panel (sections) ───────────────────── */
-    .glass-panel {
-      background: rgba(255,255,255,0.75);
-      backdrop-filter: blur(12px);
-      border: 1px solid rgba(255,255,255,0.9);
-      border-radius: 16px;
-      box-shadow: 0 4px 24px rgba(75,0,130,0.06);
-      padding: 24px;
-    }
-
-    /* ── Form Fields ──────────────────────────────── */
-    .field-label {
-      display: block; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.06em; text-transform: uppercase;
-      color: #6B7280; margin-bottom: 6px;
-    }
-    .field-input {
-      width: 100%; padding: 10px 14px;
-      border: 1px solid rgba(75,0,130,0.15);
-      border-radius: 10px; font-size: 13px;
-      background: rgba(255,255,255,0.9);
-      transition: border-color 0.2s, box-shadow 0.2s;
-      outline: none; font-family: "DM Sans", sans-serif;
-      color: #1A1A2E;
-    }
-    .field-input:focus {
-      border-color: #4B0082;
-      box-shadow: 0 0 0 3px rgba(75,0,130,0.08);
-    }
-    textarea.field-input { resize: vertical; min-height: 80px; }
-    select.field-input { cursor: pointer; }
-
-    /* ── Image Upload Zone ────────────────────────── */
+    /* ── Upload Zone ──────────────── */
     .upload-zone {
-      border: 2px dashed rgba(75,0,130,0.25);
-      border-radius: 12px; padding: 28px 20px;
-      text-align: center; cursor: pointer;
-      transition: all 0.25s ease;
+      border: 2px dashed rgba(75,0,130,0.22); border-radius: 12px;
+      padding: 28px 20px; text-align: center; cursor: pointer;
+      transition: all 0.25s;
     }
-    .upload-zone:hover, .upload-zone.drag-over {
-      border-color: #4B0082;
-      background: rgba(75,0,130,0.04);
-    }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: #4B0082; background: rgba(75,0,130,0.04); }
     .upload-zone input[type="file"] { display: none; }
-    .upload-preview {
-      width: 100%; max-height: 160px;
-      object-fit: cover; border-radius: 8px;
-      margin-top: 12px;
+    .upload-preview { width: 100%; max-height: 150px; object-fit: cover; border-radius: 8px; margin-top: 12px; }
+
+    /* ── Multi-image grid ─────────────────── */
+    .images-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
+      gap: 8px; margin-top: 12px;
+    }
+    .image-thumb-wrap {
+      position: relative; border-radius: 10px; overflow: hidden;
+      aspect-ratio: 1; background: rgba(75,0,130,0.06);
+      border: 1px solid rgba(75,0,130,0.12);
+    }
+    .image-thumb-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+    }
+    /* Remove button on each thumb */
+    .image-thumb-remove {
+      position: absolute; top: 4px; right: 4px;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(139,0,0,0.85);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; padding: 0;
+    }
+    .image-thumb-remove:hover { background: #8B0000; }
+    .image-thumb-remove svg   { width: 9px; height: 9px; }
+    /* Order badge */
+    .image-order-badge {
+      position: absolute; bottom: 4px; left: 4px;
+      background: rgba(26,26,46,0.65);
+      color: #FDFDFD; font-size: 9px; font-weight: 600;
+      padding: 2px 5px; border-radius: 4px;
+    }
+    /* Add-more mini button */
+    .add-more-btn {
+      aspect-ratio: 1; border-radius: 10px;
+      border: 2px dashed rgba(75,0,130,0.22);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 4px;
+      cursor: pointer; background: none;
+      transition: all 0.2s; color: rgba(75,0,130,0.5);
+      font-family: "Tajawal", sans-serif;
+      font-size: 10px;
+    }
+    .add-more-btn:hover {
+      border-color: #4B0082; background: rgba(75,0,130,0.04);
+      color: #4B0082;
+    }
+    /* Upload progress bar */
+    .upload-progress-bar {
+      height: 3px; border-radius: 2px;
+      background: rgba(75,0,130,0.12);
+      margin-top: 8px; overflow: hidden;
+    }
+    .upload-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4B0082, #7B2FBE);
+      border-radius: 2px;
+      transition: width 0.3s ease;
+      width: 0%;
     }
 
-    /* ── Buttons ──────────────────────────────────── */
-    .btn { display: inline-flex; align-items: center; gap-8px; padding: 10px 20px;
-           border-radius: 10px; font-size: 13px; font-weight: 500;
-           cursor: pointer; border: none; transition: all 0.2s; }
-    .btn-primary {
-      background: linear-gradient(135deg, #4B0082, #7B2FBE);
-      color: #FDFDFD;
-      box-shadow: 0 2px 12px rgba(75,0,130,0.3);
-      padding: 11px 24px;
-    }
-    .btn-primary:hover { box-shadow: 0 4px 20px rgba(75,0,130,0.4); transform: translateY(-1px); }
-    .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-danger { background: #8B0000; color: #FDFDFD; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; border: none; transition: opacity 0.2s; }
-    .btn-danger:hover { opacity: 0.85; }
-    .btn-ghost { background: transparent; border: 1px solid rgba(75,0,130,0.2); color: #4B0082; padding: 7px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; transition: all 0.2s; }
-    .btn-ghost:hover { background: rgba(75,0,130,0.06); }
-
-    /* ── Product Table ────────────────────────────── */
+    /* ── Product Row ──────────────── */
     .product-row {
       display: flex; align-items: center; gap: 12px;
       padding: 12px 0; border-bottom: 1px solid rgba(75,0,130,0.06);
     }
     .product-row:last-child { border-bottom: none; }
-    .product-thumb {
-      width: 48px; height: 48px; border-radius: 8px;
-      object-fit: cover; flex-shrink: 0;
-      background: rgba(75,0,130,0.08);
-    }
-
-    /* ── Type Badge ───────────────────────────────── */
-    .type-chip {
-      font-size: 10px; font-weight: 600; letter-spacing: 0.06em;
-      text-transform: uppercase; padding: 3px 8px; border-radius: 6px;
-    }
-    .chip-digital { background: rgba(75,0,130,0.1); color: #4B0082; }
+    .product-thumb { width: 46px; height: 46px; border-radius: 8px; object-fit: cover; flex-shrink: 0; background: rgba(75,0,130,0.08); }
+    .type-chip { font-size: 10px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; padding: 3px 8px; border-radius: 6px; }
+    .chip-digital  { background: rgba(75,0,130,0.1); color: #4B0082; }
     .chip-physical { background: rgba(139,0,0,0.1); color: #8B0000; }
 
-    /* ── Toast ────────────────────────────────────── */
+    /* ── Divider ──────────────────── */
+    .royal-divider {
+      height: 1px; margin: 20px 0;
+      background: linear-gradient(90deg, transparent, rgba(201,168,76,0.25), rgba(75,0,130,0.2), transparent);
+    }
+
+    /* ── Toast ────────────────────── */
     .royal-toast {
       position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(80px);
       background: #1A1A2E; color: #FDFDFD;
-      padding: 12px 24px; border-radius: 10px;
-      font-size: 13px; font-weight: 500;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+      padding: 12px 24px; border-radius: 10px; font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 28px rgba(0,0,0,0.2);
       transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
       z-index: 9999;
     }
     .royal-toast--visible { transform: translateX(-50%) translateY(0); }
-    .royal-toast--error { background: #8B0000; }
+    .royal-toast--error   { background: #8B0000; }
 
-    /* ── Section tabs ─────────────────────────────── */
+    /* ── Section tabs ─────────────── */
     .dash-section { display: none; }
     .dash-section.active { display: block; }
 
-    /* ── Loader ───────────────────────────────────── */
+    /* ── Spinner ──────────────────── */
     .spinner {
-      width: 20px; height: 20px;
-      border: 2px solid rgba(255,255,255,0.3);
-      border-top-color: #FDFDFD;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: inline-block;
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.3); border-top-color: #FDFDFD;
+      border-radius: 50%; animation: spin 0.7s linear infinite; display: inline-block;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Hamburger (mobile) ───────────────────────── */
-    #mobile-menu-btn {
-      display: none;
-      background: none; border: none; cursor: pointer; padding: 4px;
-    }
+    /* ── Mobile hamburger ─────────── */
+    #mobile-menu-btn { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
     @media (max-width: 768px) { #mobile-menu-btn { display: flex; } }
-    #sidebar-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.4); z-index: 40;
-    }
+    #sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 40; }
     #sidebar-overlay.open { display: block; }
   </style>
 </head>
 <body>
 
-  <!-- ══════════════════════════════════════════════
+  <!-- ══════════════════════════════════════════
        AUTH GATE
-  ══════════════════════════════════════════════ -->
+  ══════════════════════════════════════════ -->
   <div id="auth-gate">
     <div class="auth-card">
       <div class="text-center mb-8">
         <div class="w-12 h-12 rounded-xl mx-auto mb-4 flex items-center justify-center text-white font-semibold"
              style="background: linear-gradient(135deg, #8B0000, #4B0082);">NJ</div>
-        <h1 class="font-display text-2xl font-semibold text-ink">Royal Nexus</h1>
-        <p class="text-sm text-muted mt-1">Manager Dashboard</p>
+        <h1 class="font-display text-3xl font-semibold text-ink">Royal Nexus</h1>
+        <p class="text-sm text-muted mt-1">لوحة تحكم المايسترو</p>
       </div>
-      <div class="mb-4">
-        <label class="field-label">Access Password</label>
-        <input type="password" id="auth-password" placeholder="Enter password"
+
+      <div class="mb-5">
+        <label class="field-label" style="text-align:right; direction:rtl;">كلمة السر</label>
+        <input type="password" id="auth-password" class="field-input"
+               placeholder="أدخل كلمة السر"
+               style="direction:rtl;"
                onkeydown="if(event.key==='Enter') checkAuth()" />
-        <p id="auth-error" class="text-xs text-red-600 mt-2 hidden">Incorrect password. Try again.</p>
+        <p id="auth-error" class="text-xs mt-2 hidden" style="color:#C41E3A; direction:rtl;">
+          كلمة السر غير صحيحة.
+        </p>
       </div>
-      <button onclick="checkAuth()" class="btn-primary w-full justify-center" style="display:flex;">
-        Enter Dashboard
+
+      <button onclick="checkAuth()" id="auth-btn" class="btn-primary">
+        <span id="auth-btn-label">دخول إلى اللوحة</span>
       </button>
+
+      <p class="text-center text-xs text-muted mt-5" style="direction:rtl;">
+        🔒 يتم التحقق من كلمة السر عبر Vercel — لا شيء مكشوف في الكود
+      </p>
     </div>
   </div>
 
-  <!-- ══════════════════════════════════════════════
-       DASHBOARD (hidden until auth)
-  ══════════════════════════════════════════════ -->
+  <!-- ══════════════════════════════════════════
+       DASHBOARD
+  ══════════════════════════════════════════ -->
   <div id="dashboard">
 
     <!-- SIDEBAR -->
     <aside class="dash-sidebar" id="sidebar">
-      <!-- Logo -->
-      <div class="px-5 py-6 border-b border-white/5">
+      <div class="px-5 py-5 border-b border-white/5">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-semibold"
+          <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white text-xs font-bold"
                style="background: linear-gradient(135deg, #8B0000, #4B0082);">NJ</div>
           <div>
             <p class="text-white text-sm font-semibold">Royal Nexus</p>
-            <p class="text-white/40 text-xs">Maestro Panel</p>
+            <p class="text-xs" style="color:rgba(255,255,255,0.35);">المايسترو</p>
           </div>
         </div>
       </div>
 
-      <!-- Nav -->
-      <nav class="p-4 flex flex-col gap-1">
-        <a class="nav-item active" data-section="overview" onclick="switchSection('overview', this)">
+      <nav class="p-3 flex flex-col gap-1">
+        <a class="nav-item active" data-section="overview" onclick="switchSection('overview',this)">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
-          Overview
+          نظرة عامة
         </a>
-        <a class="nav-item" data-section="products" onclick="switchSection('products', this)">
+        <a class="nav-item" data-section="products" onclick="switchSection('products',this)">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M20 7H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h16a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zM16 3H8l-1 4h10l-1-4z"/></svg>
-          Products
+          المنتجات
         </a>
-        <a class="nav-item" data-section="add-product" onclick="switchSection('add-product', this)">
+        <a class="nav-item" data-section="add-product" onclick="switchSection('add-product',this)">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-          Add Product
+          إضافة منتج
         </a>
-        <a class="nav-item" data-section="tools" onclick="switchSection('tools', this)">
+        <a class="nav-item" data-section="tools" onclick="switchSection('tools',this)">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>
-          Tools
+          أدوات
         </a>
       </nav>
 
-      <!-- Sign out -->
-      <div class="p-4 mt-auto border-t border-white/5 absolute bottom-0 w-full">
-        <button onclick="signOut()" class="nav-item w-full text-left" style="color: rgba(255,255,255,0.35);">
+      <div class="p-3 absolute bottom-0 w-full border-t border-white/5">
+        <button onclick="signOut()" class="nav-item w-full" style="color:rgba(255,255,255,0.3);">
           <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
-          Sign Out
+          تسجيل الخروج
         </button>
       </div>
     </aside>
 
-    <!-- Sidebar overlay (mobile) -->
     <div id="sidebar-overlay" onclick="closeSidebar()"></div>
 
-    <!-- MAIN CONTENT -->
+    <!-- MAIN -->
     <main class="dash-main">
+
       <!-- Top Bar -->
-      <div class="top-bar">
+      <div class="flex items-center justify-between mb-7 pb-5 border-b border-purple-100">
         <div class="flex items-center gap-4">
           <button id="mobile-menu-btn" onclick="openSidebar()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
           </button>
           <div>
-            <h1 class="font-display text-2xl font-semibold text-ink" id="section-title">Overview</h1>
-            <p class="text-xs text-muted" id="section-subtitle">Dashboard summary</p>
+            <h1 class="font-display text-2xl font-semibold text-ink" id="section-title">نظرة عامة</h1>
+            <p class="text-xs text-muted" id="section-subtitle">ملخص اللوحة</p>
           </div>
         </div>
         <a href="index.html" target="_blank" class="btn-ghost text-xs flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
-          View Store
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+          المتجر
         </a>
       </div>
 
-      <!-- ── SECTION: Overview ─────────────────── -->
+      <!-- ── Overview ─────────────── -->
       <section class="dash-section active" id="section-overview">
-        <!-- Stats grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-          <div class="stat-card">
-            <p class="text-xs text-muted uppercase tracking-widest mb-1">Total Products</p>
-            <p class="font-display text-3xl font-semibold text-ink" id="stat-total">—</p>
-          </div>
-          <div class="stat-card">
-            <p class="text-xs text-muted uppercase tracking-widest mb-1">Digital</p>
-            <p class="font-display text-3xl font-semibold" style="color:#4B0082" id="stat-digital">—</p>
-          </div>
-          <div class="stat-card">
-            <p class="text-xs text-muted uppercase tracking-widest mb-1">Physical</p>
-            <p class="font-display text-3xl font-semibold" style="color:#8B0000" id="stat-physical">—</p>
-          </div>
-          <div class="stat-card">
-            <p class="text-xs text-muted uppercase tracking-widest mb-1">Avg. Price</p>
-            <p class="font-display text-3xl font-semibold text-ink" id="stat-avg">—</p>
-          </div>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-7">
+          <div class="stat-card"><p class="text-xs text-muted mb-1" style="direction:rtl;">إجمالي المنتجات</p><p class="font-display text-3xl font-semibold text-ink" id="stat-total">—</p></div>
+          <div class="stat-card"><p class="text-xs text-muted mb-1" style="direction:rtl;">رقمية</p><p class="font-display text-3xl font-semibold" style="color:#4B0082" id="stat-digital">—</p></div>
+          <div class="stat-card"><p class="text-xs text-muted mb-1" style="direction:rtl;">مادية</p><p class="font-display text-3xl font-semibold" style="color:#8B0000" id="stat-physical">—</p></div>
+          <div class="stat-card"><p class="text-xs text-muted mb-1" style="direction:rtl;">متوسط السعر</p><p class="font-display text-3xl font-semibold text-ink" id="stat-avg">—</p></div>
         </div>
-
-        <!-- Recent products preview -->
         <div class="glass-panel">
           <div class="flex items-center justify-between mb-5">
-            <h2 class="font-display text-xl font-semibold text-ink">Recent Products</h2>
-            <a onclick="switchSection('products', document.querySelector('[data-section=products]'))" class="text-xs text-royal cursor-pointer hover:underline">View all →</a>
+            <h2 class="font-display text-xl font-semibold">آخر المنتجات</h2>
+            <a onclick="switchSection('products', document.querySelector('[data-section=products]'))" class="text-xs cursor-pointer hover:underline" style="color:#4B0082;">عرض الكل ←</a>
           </div>
-          <div id="overview-product-list"><p class="text-sm text-muted">Loading…</p></div>
+          <div id="overview-product-list"><p class="text-sm text-muted">جار التحميل…</p></div>
         </div>
       </section>
 
-      <!-- ── SECTION: Products ─────────────────── -->
+      <!-- ── Products ─────────────── -->
       <section class="dash-section" id="section-products">
         <div class="glass-panel">
           <div class="flex items-center justify-between mb-5">
-            <h2 class="font-display text-xl font-semibold">All Products</h2>
-            <button onclick="loadProducts()" class="btn-ghost text-xs">↻ Refresh</button>
+            <h2 class="font-display text-xl font-semibold">جميع المنتجات</h2>
+            <button onclick="loadProducts()" class="btn-ghost text-xs">↻ تحديث</button>
           </div>
-          <div id="products-list"><p class="text-sm text-muted">Loading…</p></div>
+          <div id="products-list"><p class="text-sm text-muted">جار التحميل…</p></div>
         </div>
       </section>
 
-      <!-- ── SECTION: Add Product ──────────────── -->
+      <!-- ── Add Product ───────────── -->
       <section class="dash-section" id="section-add-product">
-        <div class="glass-panel max-w-xl">
-          <h2 class="font-display text-xl font-semibold mb-6">Add New Product</h2>
+        <div class="glass-panel max-w-lg">
+          <h2 class="font-display text-xl font-semibold mb-6">إضافة منتج جديد</h2>
+          <div class="grid gap-4">
 
-          <form id="add-product-form" class="grid gap-4">
-            <!-- Name -->
             <div>
-              <label class="field-label">Product Name *</label>
-              <input type="text" id="f-name" class="field-input" placeholder="e.g. Elite Landing Page Template" />
+              <label class="field-label">اسم المنتج *</label>
+              <input type="text" id="f-name" class="field-input" placeholder="مثال: قالب صفحة هبوط فاخر" style="direction:rtl;" />
             </div>
 
-            <!-- Type -->
             <div>
-              <label class="field-label">Product Type *</label>
+              <label class="field-label">نوع المنتج *</label>
               <select id="f-type" class="field-input" onchange="toggleTypeFields()">
-                <option value="digital">⚡ Digital Product</option>
-                <option value="physical">📦 Physical Product</option>
+                <option value="digital">⚡ منتج رقمي</option>
+                <option value="physical">📦 منتج مادي</option>
               </select>
             </div>
 
-            <!-- Price -->
             <div>
-              <label class="field-label">Price (USD) *</label>
+              <label class="field-label">السعر (USD) *</label>
               <input type="number" id="f-price" class="field-input" placeholder="49.00" min="0" step="0.01" />
             </div>
 
-            <!-- Description -->
             <div>
-              <label class="field-label">Description</label>
-              <textarea id="f-description" class="field-input" rows="3" placeholder="Brief description of what the customer receives…"></textarea>
+              <label class="field-label">الوصف</label>
+              <textarea id="f-description" class="field-input" placeholder="وصف مختصر للمنتج…"></textarea>
             </div>
 
-            <!-- Image Upload -->
+            <!-- Multi-Image Upload -->
             <div>
-              <label class="field-label">Product Image</label>
-              <div class="upload-zone" id="upload-zone" onclick="document.getElementById('f-image').click()"
+              <label class="field-label">
+                صور المنتج
+                <span class="text-xs font-normal normal-case tracking-normal text-muted mr-1">
+                  (حتى 5 صور · الأولى هي الرئيسية)
+                </span>
+              </label>
+
+              <!-- Drop zone — يظهر فقط إذا لم تُرفع صور بعد -->
+              <div class="upload-zone" id="upload-zone"
+                   onclick="document.getElementById('f-images').click()"
                    ondragover="event.preventDefault(); this.classList.add('drag-over')"
                    ondragleave="this.classList.remove('drag-over')"
-                   ondrop="handleImageDrop(event)">
-                <input type="file" id="f-image" accept="image/*" onchange="handleImageSelect(event)" />
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 mx-auto mb-2 text-royal/40" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/></svg>
-                <p class="text-sm text-muted">Tap to upload or drag & drop</p>
-                <p class="text-xs text-muted/60 mt-1">JPG, PNG, WebP · Max 5MB</p>
-                <img id="image-preview" class="upload-preview hidden" />
+                   ondrop="handleImagesDrop(event)">
+                <input type="file" id="f-images"
+                       accept="image/*" multiple
+                       onchange="handleImagesSelect(event)" />
+                <svg class="w-8 h-8 mx-auto mb-2"
+                     style="color:rgba(75,0,130,0.35)"
+                     fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor" stroke-width="1.5">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2
+                           1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01
+                           M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6
+                           a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
+                </svg>
+                <p class="text-sm text-muted">اضغط لاختيار صور أو اسحبها هنا</p>
+                <p class="text-xs mt-1" style="color:rgba(107,114,128,0.6)">
+                  JPG، PNG، WebP · حد أقصى 5MB لكل صورة
+                </p>
               </div>
+
+              <!-- Grid معاينة الصور المختارة -->
+              <div class="images-grid" id="images-grid"></div>
+
+              <!-- Progress bar (تظهر أثناء الرفع) -->
+              <div class="upload-progress-bar" id="upload-progress-bar" style="display:none;">
+                <div class="upload-progress-fill" id="upload-progress-fill"></div>
+              </div>
+
+              <!-- حالة الرفع -->
+              <p id="upload-status"
+                 class="text-xs mt-2 hidden"
+                 style="color:#4B0082; direction:rtl;"></p>
             </div>
 
-            <!-- Digital ZIP Upload (digital only) -->
+            <!-- Digital: Download URL -->
             <div id="f-download-wrap">
-              <label class="field-label">Digital ZIP File *</label> 
-<input type="file" id="f-download-file" class="field-input" accept=".zip,application/zip,application/x-zip-compressed" />
-<p class="text-xs text-muted mt-1"> 
-Upload the ZIP file now. It will be stored in your GitHub repo and delivered after successful PayPal payment. 
-</p> 
-<label class="field-label mt-3">Or External Download URL 
-<span class="text-royal/60 normal-case font-normal tracking-normal ml-1">(optional fallback, will be obfuscated)</span>
-
+              <label class="field-label">رابط التحميل *
+                <span class="text-xs font-normal normal-case tracking-normal text-muted mr-1">(سيُخزَّن مشفراً)</span>
               </label>
-              <input type="url" id="f-download-url" class="field-input" placeholder="https://example.com/your-file.zip" />
-              <p class="text-xs text-muted mt-1">
-                ℹ️ This URL is stored obfuscated using XOR encoding. It's not encryption — use private links.
-              </p>
+              <input type="url" id="f-download-url" class="field-input" placeholder="https://drive.google.com/…" />
             </div>
 
-            <!-- Stock (physical only) -->
+            <!-- Physical: Stock -->
             <div id="f-stock-wrap" class="hidden">
-              <label class="field-label">Stock Quantity</label>
+              <label class="field-label">الكمية المتاحة</label>
               <input type="number" id="f-stock" class="field-input" placeholder="0" min="0" />
             </div>
 
-            <!-- Submit -->
-            <div class="pt-2">
-   <button type="submit" id="submit-btn" class="btn-primary w-full justify-center" style="display:flex; gap:8px;">
-                <span id="submit-label">Add Product to Store</span>
+            <div class="pt-1">
+              <button id="submit-btn" onclick="submitProduct()" class="btn-primary">
+                <span id="submit-label">نشر المنتج في المتجر</span>
               </button>
             </div>
-          </form>
+          </div>
         </div>
       </section>
 
-      <!-- ── SECTION: Tools ────────────────────── -->
+      <!-- ── Tools ─────────────────── -->
       <section class="dash-section" id="section-tools">
         <div class="grid md:grid-cols-2 gap-6">
-
-          <!-- URL Encoder Tool -->
           <div class="glass-panel">
-            <h2 class="font-display text-xl font-semibold mb-1">URL Obfuscator</h2>
-            <p class="text-xs text-muted mb-4">Encode/decode download URLs for storage in products.json</p>
-            <textarea id="tool-url-input" class="field-input mb-3" rows="3" placeholder="Paste URL or encoded string…"></textarea>
+            <h2 class="font-display text-xl font-semibold mb-1">تشفير الروابط</h2>
+            <p class="text-xs text-muted mb-4">تشفير / فك تشفير روابط التحميل قبل حفظها في products.json</p>
+            <textarea id="tool-url-input" class="field-input mb-3" rows="3" placeholder="الصق الرابط أو النص المشفر…"></textarea>
             <div class="flex gap-3">
-              <button onclick="toolEncode()" class="btn-primary flex-1" style="padding:9px; justify-content:center; display:flex;">Encode →</button>
-              <button onclick="toolDecode()" class="btn-ghost flex-1" style="padding:9px; justify-content:center; display:flex;">← Decode</button>
+              <button onclick="toolEncode()" class="btn-primary flex-1" style="padding:9px;">تشفير →</button>
+              <button onclick="toolDecode()" class="btn-ghost flex-1" style="padding:9px;">← فك</button>
             </div>
-            <textarea id="tool-url-output" class="field-input mt-3" rows="3" readonly placeholder="Result…"></textarea>
+            <textarea id="tool-url-output" class="field-input mt-3" rows="3" readonly placeholder="النتيجة…"></textarea>
           </div>
-
-          <!-- Danger Zone -->
-          <div class="glass-panel border border-red-100">
-            <h2 class="font-display text-xl font-semibold mb-1 text-crimson">Danger Zone</h2>
-            <p class="text-xs text-muted mb-4">Irreversible actions on your product data</p>
-            <div class="p-4 rounded-lg bg-red-50/60 border border-red-100">
-              <p class="text-sm font-medium text-ink mb-1">Export products.json</p>
-              <p class="text-xs text-muted mb-3">Download a local backup of your product data</p>
-              <button onclick="exportProducts()" class="btn-ghost text-xs">Download Backup</button>
+          <div class="glass-panel" style="border-color:rgba(139,0,0,0.12);">
+            <h2 class="font-display text-xl font-semibold mb-1" style="color:#8B0000;">منطقة الخطر</h2>
+            <div class="p-4 rounded-lg mt-3" style="background:rgba(139,0,0,0.04); border:1px solid rgba(139,0,0,0.1);">
+              <p class="text-sm font-medium mb-1">تصدير نسخة احتياطية</p>
+              <p class="text-xs text-muted mb-3">تحميل ملف products.json كنسخة احتياطية</p>
+              <button onclick="exportProducts()" class="btn-ghost text-xs">تحميل النسخة الاحتياطية</button>
             </div>
           </div>
-
         </div>
       </section>
 
     </main>
   </div><!-- /#dashboard -->
 
-  <!-- SCRIPTS -->
   <script src="config.js"></script>
-  <script> 
-
-// Fallback config when config.js is missing in deployment (e.g., not committed or not served). 
-
-if (!window.ROYAL_CONFIG) { 
-
-window.ROYAL_CONFIG = { 
-
-github: { 
-
-pat: "", 
-
-owner: "jawadnajih27-spec", 
-
-// Must match the deployed storefront repository by default. 
-repo: "nexus-njservices", 
-
-branch: "main", 
-
-productsPath: "data/products.json", 
-
-  digitalProductsPath: "data/digital-products",
-  
-}, 
-
-paypal: { 
-
-clientId: "YOUR_PAYPAL_CLIENT_ID_HERE", 
-
-currency: "USD", 
-
-get sdkUrl() { 
-
-return `https://www.paypal.com/sdk/js?client-id=${this.clientId}&currency=${this.currency}`; 
-
-}, 
-
-}, 
-
-cloudinary: { 
-
-cloudName: "dztczxekd", 
-
-uploadPreset: "royal_nexus_unsigned", 
-
-get uploadUrl() { 
-
-return `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`; 
-
-}, 
-
-}, 
-
-manager: { 
-
-accessPassword: "njservices25", 
-
-}, 
-
-security: { 
-
-obfuscationKey: "NJSERVICES_ROYAL_KEY_2025", 
-
-}, 
-
-}; 
-
-} 
-
-if (typeof window.getGitHubHeaders !== "function") { 
-
-window.getGitHubHeaders = function getGitHubHeaders() { 
-
-const headers = { 
-
-"Accept": "application/vnd.github+json", 
-
-"Content-Type": "application/json", 
-
-}; 
-
-const pat = (window.ROYAL_CONFIG.github.pat || "").trim(); 
-
-if (pat) { 
-
-headers["Authorization"] = pat.startsWith("github_pat_") ? `Bearer ${pat}` : `token ${pat}`; 
-
-} 
-
-return headers; 
-
-}; 
-
-} 
-
-if (typeof window.getGitHubUrl !== "function") { 
-
-window.getGitHubUrl = function getGitHubUrl(path, options = {}) { 
-
-const { owner, repo } = window.ROYAL_CONFIG.github; 
-
-const normalizedPath = String(path || "").replace(/^\/+/, ""); 
-
-let url = `https://api.github.com/repos/${owner}/${repo}/contents/${normalizedPath}`; 
-
-if (options.ref) { 
-
-url += `?ref=${encodeURIComponent(options.ref)}`; 
-
-} 
-
-return url; 
-
-}; 
-
-} 
-
-</script>
-
-
   <script src="app.js"></script>
   <script>
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
     // AUTH
-    // ─────────────────────────────────────────────
-    function checkAuth() {
-      const errorEl = document.getElementById("auth-error");
-      const input = document.getElementById("auth-password"); 
+    // ─────────────────────────────────────────
+    async function checkAuth() {
+      const password = document.getElementById("auth-password").value.trim();
+      const inputEl  = document.getElementById("auth-password");
+      const errorEl  = document.getElementById("auth-error");
+      const btn      = document.getElementById("auth-btn");
+      const label    = document.getElementById("auth-btn-label");
 
-const pw = input.value.trim();
-
-            errorEl.classList.add("hidden"); 
-
-input.classList.remove("error");
-
-      if (!window.ROYAL_CONFIG || !ROYAL_CONFIG.manager) {
-        errorEl.textContent = "Configuration error: ROYAL_CONFIG is missing.";
+      if (!password) {
+        inputEl.classList.add("error");
+        errorEl.textContent = "يرجى إدخال كلمة السر.";
         errorEl.classList.remove("hidden");
-        console.error("[RoyalNexus] Missing ROYAL_CONFIG in manager.html");
+        setTimeout(() => inputEl.classList.remove("error"), 400);
         return;
       }
 
-      if (pw === ROYAL_CONFIG.manager.accessPassword) {
-        document.getElementById("auth-gate").style.display = "none";
-        document.getElementById("dashboard").style.display = "block";
+      btn.disabled    = true;
+      label.innerHTML = `<span class="spinner"></span>`;
+
+      console.log("[Auth] Verifying password via /api/github…");
+
+      // التحقق عبر Vercel API — السيرفر يقارن بـ ADMIN_PASSWORD
+      const authorized = await verifyAdminPassword(password);
+
+      if (authorized) {
+        console.log("[Auth] ✅ Access granted.");
+        setSessionPassword(password); // يُحفظ في الذاكرة فقط
+        document.getElementById("auth-gate").style.display   = "none";
+        document.getElementById("dashboard").style.display   = "block";
         loadProducts();
       } else {
-        input.classList.add("error");
-        errorEl.textContent = "Incorrect password. Try again."; 
-errorEl.classList.remove("hidden");
-
-        setTimeout(() => input.classList.remove("error"), 600);
+        console.warn("[Auth] ❌ Wrong password.");
+        inputEl.classList.add("error");
+        errorEl.textContent = "كلمة السر غير صحيحة.";
+        errorEl.classList.remove("hidden");
+        setTimeout(() => inputEl.classList.remove("error"), 400);
+        btn.disabled  = false;
+        label.textContent = "دخول إلى اللوحة";
       }
     }
 
     function signOut() {
-      document.getElementById("dashboard").style.display = "none";
-      document.getElementById("auth-gate").style.display = "flex";
-      document.getElementById("auth-password").value = "";
+      clearSession();
+      document.getElementById("dashboard").style.display   = "none";
+      document.getElementById("auth-gate").style.display   = "flex";
+      document.getElementById("auth-password").value       = "";
+      document.getElementById("auth-error").classList.add("hidden");
     }
 
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
     // NAVIGATION
-    // ─────────────────────────────────────────────
-    const sectionTitles = {
-      overview: ["Overview", "Dashboard summary"],
-      products: ["Products", "Manage your catalogue"],
-      "add-product": ["Add Product", "Publish to your store"],
-      tools: ["Tools", "Utilities & utilities"],
+    // ─────────────────────────────────────────
+    const sectionMeta = {
+      overview:      ["نظرة عامة",   "ملخص اللوحة"],
+      products:      ["المنتجات",    "إدارة الكتالوج"],
+      "add-product": ["إضافة منتج", "نشر في المتجر"],
+      tools:         ["أدوات",       "مساعدات ومرافق"],
     };
 
     function switchSection(key, el) {
@@ -685,250 +571,325 @@ errorEl.classList.remove("hidden");
       document.querySelectorAll(".nav-item").forEach((n) => n.classList.remove("active"));
       document.getElementById(`section-${key}`).classList.add("active");
       if (el) el.classList.add("active");
-      const [title, sub] = sectionTitles[key] || ["", ""];
-      document.getElementById("section-title").textContent = title;
+      const [title, sub] = sectionMeta[key] || ["", ""];
+      document.getElementById("section-title").textContent    = title;
       document.getElementById("section-subtitle").textContent = sub;
       closeSidebar();
     }
 
-    function openSidebar() {
-      document.getElementById("sidebar").classList.add("open");
-      document.getElementById("sidebar-overlay").classList.add("open");
-    }
-    function closeSidebar() {
-      document.getElementById("sidebar").classList.remove("open");
-      document.getElementById("sidebar-overlay").classList.remove("open");
-    }
+    function openSidebar()  { document.getElementById("sidebar").classList.add("open"); document.getElementById("sidebar-overlay").classList.add("open"); }
+    function closeSidebar() { document.getElementById("sidebar").classList.remove("open"); document.getElementById("sidebar-overlay").classList.remove("open"); }
 
-    // ─────────────────────────────────────────────
-    // LOAD PRODUCTS
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
+    // PRODUCTS
+    // ─────────────────────────────────────────
     let cachedProducts = [];
-    let cachedSha = "";
+    let cachedSha      = "";
 
     async function loadProducts() {
       try {
         const { products, sha } = await fetchProducts();
         cachedProducts = products;
-        cachedSha = sha;
+        cachedSha      = sha;
         renderOverview(products);
         renderProductsList(products);
       } catch (err) {
-        showToast("Failed to load products: " + err.message, "error");
+        showToast("فشل تحميل المنتجات: " + err.message, "error");
       }
     }
 
     function renderOverview(products) {
-      const digital = products.filter((p) => p.type === "digital").length;
+      const digital  = products.filter((p) => p.type === "digital").length;
       const physical = products.filter((p) => p.type === "physical").length;
-      const avg = products.length
+      const avg      = products.length
         ? (products.reduce((s, p) => s + parseFloat(p.price || 0), 0) / products.length).toFixed(2)
         : "0.00";
 
-      document.getElementById("stat-total").textContent = products.length;
-      document.getElementById("stat-digital").textContent = digital;
+      document.getElementById("stat-total").textContent    = products.length;
+      document.getElementById("stat-digital").textContent  = digital;
       document.getElementById("stat-physical").textContent = physical;
-      document.getElementById("stat-avg").textContent = `$${avg}`;
+      document.getElementById("stat-avg").textContent      = `$${avg}`;
 
       const list = document.getElementById("overview-product-list");
-      if (!products.length) { list.innerHTML = `<p class="text-sm text-muted">No products yet. <a onclick="switchSection('add-product', document.querySelector('[data-section=add-product]'))" class="text-royal cursor-pointer underline">Add one →</a></p>`; return; }
-
-      list.innerHTML = products.slice(0, 5).map((p) => productRowHTML(p)).join("");
+      if (!products.length) {
+        list.innerHTML = `<p class="text-sm text-muted">لا توجد منتجات بعد. <a onclick="switchSection('add-product', document.querySelector('[data-section=add-product]'))" class="cursor-pointer underline" style="color:#4B0082">أضف منتجاً ←</a></p>`;
+        return;
+      }
+      list.innerHTML = products.slice(0, 5).map(productRowHTML).join("");
     }
 
     function renderProductsList(products) {
       const list = document.getElementById("products-list");
-      if (!products.length) { list.innerHTML = `<p class="text-sm text-muted">No products yet.</p>`; return; }
-      list.innerHTML = products.map((p) => `
+      if (!products.length) { list.innerHTML = `<p class="text-sm text-muted">لا توجد منتجات.</p>`; return; }
+      list.innerHTML = products.map((p) => {
+        const thumb = (p.images && p.images[0]) || p.imageUrl || "https://via.placeholder.com/46";
+        return `
         <div class="product-row">
-          <img class="product-thumb" src="${p.imageUrl || 'https://via.placeholder.com/48'}" alt="${p.name}" />
+          <img class="product-thumb" src="${thumb}" alt="${p.name}" />
           <div class="flex-1 min-w-0">
             <p class="font-medium text-sm text-ink truncate">${p.name}</p>
-            <p class="text-xs text-muted">$${parseFloat(p.price).toFixed(2)}</p>
+            <p class="text-xs text-muted">
+              $${parseFloat(p.price).toFixed(2)}
+              <span class="mr-2" style="color:#9B8EC4;">
+                ${p.images && p.images.length > 1 ? `· ${p.images.length} صور` : ""}
+              </span>
+            </p>
           </div>
-          <span class="type-chip ${p.type === 'digital' ? 'chip-digital' : 'chip-physical'}">${p.type}</span>
-          <button onclick="deleteProductById('${p.id}')" class="btn-danger text-xs flex-shrink-0">Delete</button>
-        </div>
-      `).join("");
+          <span class="type-chip ${p.type === 'digital' ? 'chip-digital' : 'chip-physical'}">
+            ${p.type === 'digital' ? 'رقمي' : 'مادي'}
+          </span>
+          <button onclick="deleteProductById('${p.id}')" class="btn-danger">حذف</button>
+        </div>`;
+      }).join("");
     }
 
     function productRowHTML(p) {
+      const thumb = (p.images && p.images[0]) || p.imageUrl || "https://via.placeholder.com/46";
       return `
         <div class="product-row">
-          <img class="product-thumb" src="${p.imageUrl || 'https://via.placeholder.com/48'}" alt="${p.name}" />
+          <img class="product-thumb" src="${thumb}" alt="${p.name}" />
           <div class="flex-1 min-w-0">
             <p class="font-medium text-sm text-ink truncate">${p.name}</p>
             <p class="text-xs text-muted">$${parseFloat(p.price).toFixed(2)}</p>
           </div>
-          <span class="type-chip ${p.type === 'digital' ? 'chip-digital' : 'chip-physical'}">${p.type}</span>
+          <span class="type-chip ${p.type === 'digital' ? 'chip-digital' : 'chip-physical'}">${p.type === 'digital' ? 'رقمي' : 'مادي'}</span>
         </div>`;
     }
 
-    // ─────────────────────────────────────────────
-    // ADD PRODUCT FORM
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
+    // ADD PRODUCT
+    // ─────────────────────────────────────────
     function toggleTypeFields() {
       const type = document.getElementById("f-type").value;
       document.getElementById("f-download-wrap").style.display = type === "digital" ? "" : "none";
-      document.getElementById("f-stock-wrap").style.display = type === "physical" ? "" : "none";
+      document.getElementById("f-stock-wrap").style.display    = type === "physical" ? "" : "none";
     }
 
-    // Image selection/preview
-    let selectedImageFile = null;
+    // ─────────────────────────────────────────
+    // MULTI-IMAGE STATE
+    // قائمة الصور: كل عنصر { file: File, previewUrl: string }
+    // الحد الأقصى 5 صور
+    // ─────────────────────────────────────────
+    const MAX_IMAGES = 5;
+    let selectedImages = []; // [{ file, previewUrl }]
 
-    function handleImageSelect(e) {
-      const file = e.target.files[0];
-      if (file) previewImage(file);
+    /** إضافة ملفات جديدة إلى القائمة */
+    function addImageFiles(files) {
+      const remaining = MAX_IMAGES - selectedImages.length;
+      if (remaining <= 0) {
+        showToast(`الحد الأقصى ${MAX_IMAGES} صور`, "error");
+        return;
+      }
+      const toAdd = Array.from(files)
+        .filter((f) => f.type.startsWith("image/"))
+        .slice(0, remaining);
+
+      toAdd.forEach((file) => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          selectedImages.push({ file, previewUrl: e.target.result });
+          renderImagesGrid();
+        };
+        reader.readAsDataURL(file);
+      });
     }
-    function handleImageDrop(e) {
+
+    /** حذف صورة من القائمة بالفهرس */
+    function removeImage(index) {
+      selectedImages.splice(index, 1);
+      renderImagesGrid();
+    }
+
+    /** رسم شبكة المعاينة */
+    function renderImagesGrid() {
+      const grid = document.getElementById("images-grid");
+      const zone = document.getElementById("upload-zone");
+
+      // إخفاء/إظهار منطقة الرفع
+      zone.style.display = selectedImages.length === 0 ? "" : "none";
+
+      const canAddMore = selectedImages.length < MAX_IMAGES;
+
+      grid.innerHTML = selectedImages.map((img, i) => `
+        <div class="image-thumb-wrap">
+          <img src="${img.previewUrl}" alt="صورة ${i + 1}" />
+          <span class="image-order-badge">${i === 0 ? "رئيسية" : i + 1}</span>
+          <button class="image-thumb-remove"
+                  onclick="removeImage(${i})"
+                  title="حذف الصورة">
+            <svg viewBox="0 0 10 10" fill="none"
+                 stroke="#FDFDFD" stroke-width="2"
+                 stroke-linecap="round">
+              <line x1="1" y1="1" x2="9" y2="9"/>
+              <line x1="9" y1="1" x2="1" y2="9"/>
+            </svg>
+          </button>
+        </div>
+      `).join("") + (canAddMore ? `
+        <button class="add-more-btn"
+                onclick="document.getElementById('f-images').click()"
+                title="إضافة صورة">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <line x1="12" y1="5" x2="12" y2="19"/>
+            <line x1="5" y1="12" x2="19" y2="12"/>
+          </svg>
+          <span>إضافة</span>
+        </button>
+      ` : "");
+    }
+
+    /** معالجة اختيار الملفات من input */
+    function handleImagesSelect(e) {
+      addImageFiles(e.target.files);
+      // إعادة تعيين input حتى يمكن اختيار نفس الملف مجدداً
+      e.target.value = "";
+    }
+
+    /** معالجة السحب والإفلات */
+    function handleImagesDrop(e) {
       e.preventDefault();
       document.getElementById("upload-zone").classList.remove("drag-over");
-      const file = e.dataTransfer.files[0];
-      if (file && file.type.startsWith("image/")) previewImage(file);
-    }
-    function previewImage(file) {
-      selectedImageFile = file;
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const preview = document.getElementById("image-preview");
-        preview.src = e.target.result;
-        preview.classList.remove("hidden");
-      };
-      reader.readAsDataURL(file);
+      addImageFiles(e.dataTransfer.files);
     }
 
-    async function submitProduct(e) {
-if (e) e.preventDefault();
-      const name = document.getElementById("f-name").value.trim();
-      const type = document.getElementById("f-type").value;
-      const price = parseFloat(document.getElementById("f-price").value);
-      const description = document.getElementById("f-description").value.trim();
-      const downloadUrlRaw = type === "digital" ? document.getElementById("f-download-url").value.trim() : "";
-const zipFile = type === "digital" ? document.getElementById("f-download-file").files[0] : null;
-      
-      // Basic validation
-      if (!name) { showToast("Product name is required", "error"); return; }
-      if (isNaN(price) || price < 0) { showToast("Enter a valid price", "error"); return; }
-      if (type === "digital" && !zipFile && !downloadUrlRaw) { 
-showToast("Upload a ZIP file or provide a download URL for digital products", "error"); 
-return; 
-}
+    /** رفع جميع الصور إلى Cloudinary وإعادة مصفوفة الروابط */
+    async function uploadAllImages(onProgress) {
+      const urls = [];
+      for (let i = 0; i < selectedImages.length; i++) {
+        onProgress(i, selectedImages.length);
+        const url = await uploadImage(selectedImages[i].file);
+        urls.push(url);
+        console.log(`[Manager] Image ${i + 1}/${selectedImages.length} uploaded:`, url);
+      }
+      onProgress(selectedImages.length, selectedImages.length);
+      return urls;
+    }
 
-      const btn = document.getElementById("submit-btn");
-      const label = document.getElementById("submit-label");
-      btn.disabled = true;
-      label.innerHTML = `<span class="spinner"></span> Uploading…`;
+    // ─────────────────────────────────────────
+    // SUBMIT PRODUCT
+    // ─────────────────────────────────────────
+    async function submitProduct() {
+      const name           = document.getElementById("f-name").value.trim();
+      const type           = document.getElementById("f-type").value;
+      const price          = parseFloat(document.getElementById("f-price").value);
+      const description    = document.getElementById("f-description").value.trim();
+      const downloadUrlRaw = type === "digital"
+        ? document.getElementById("f-download-url").value.trim()
+        : "";
+
+      // Validation
+      if (!name)                                { showToast("اسم المنتج مطلوب", "error"); return; }
+      if (isNaN(price) || price < 0)            { showToast("أدخل سعراً صحيحاً", "error"); return; }
+      if (type === "digital" && !downloadUrlRaw){ showToast("رابط التحميل مطلوب للمنتجات الرقمية", "error"); return; }
+
+      const btn      = document.getElementById("submit-btn");
+      const label    = document.getElementById("submit-label");
+      const statusEl = document.getElementById("upload-status");
+      const progBar  = document.getElementById("upload-progress-bar");
+      const progFill = document.getElementById("upload-progress-fill");
+      btn.disabled   = true;
 
       try {
-        // Fail fast before uploading image when GitHub config is invalid. 
-if (typeof validateGitHubConfig === "function") { 
-validateGitHubConfig(); 
-} 
+        // 1️⃣  رفع الصور إلى Cloudinary
+        let imageUrls = [];
 
-        // Upload image to Cloudinary (if selected)
-        let imageUrl = "";
-        if (selectedImageFile) {
-          imageUrl = await uploadImage(selectedImageFile);
+        if (selectedImages.length > 0) {
+          label.innerHTML = `<span class="spinner"></span> جار رفع الصور…`;
+          statusEl.classList.remove("hidden");
+          progBar.style.display = "";
+
+          imageUrls = await uploadAllImages((done, total) => {
+            const pct = Math.round((done / total) * 100);
+            progFill.style.width  = `${pct}%`;
+            statusEl.textContent  =
+              done < total
+                ? `⏳ جار رفع الصورة ${done + 1} من ${total}…`
+                : `✅ تم رفع ${total} صورة بنجاح`;
+          });
+
+          progBar.style.display = "none";
         }
 
-        let finalDownloadUrl = downloadUrlRaw; 
-if (type === "digital" && zipFile) { 
-label.innerHTML = `<span class="spinner"></span> Uploading ZIP file…`; 
-finalDownloadUrl = await uploadDigitalZip(zipFile); 
-} 
-        // Build product object
+        // 2️⃣  بناء كائن المنتج
         const product = {
-          id: generateId(),
+          id:          generateId(),
           name,
           type,
           price,
           description,
-          imageUrl,
-          createdAt: new Date().toISOString(),
-          // Obfuscate download URL before storing
-          downloadUrl: finalDownloadUrl ? encodeDownloadUrl(finalDownloadUrl) : "",
-          stock: type === "physical" ? parseInt(document.getElementById("f-stock").value || "0") : null,
+          // images[] هي المصدر الرئيسي — imageUrl للتوافق مع الكود القديم
+          images:      imageUrls,
+          imageUrl:    imageUrls[0] || "",
+          subtitle:    "",  // يمكن إضافة حقل لاحقاً
+          downloadUrl: downloadUrlRaw ? encodeDownloadUrl(downloadUrlRaw) : "",
+          stock:       type === "physical"
+                         ? parseInt(document.getElementById("f-stock").value || "0")
+                         : null,
+          createdAt:   new Date().toISOString(),
         };
 
-        label.innerHTML = `<span class="spinner"></span> Saving to GitHub…`;
+        // 3️⃣  حفظ في GitHub عبر API
+        label.innerHTML = `<span class="spinner"></span> جار الحفظ في GitHub…`;
         await addProduct(product);
 
-        showToast(`"${name}" published to store!`);
+        showToast(`✅ تم نشر "${name}" في المتجر!`);
 
-        // Reset form
-        ["f-name","f-price","f-description","f-download-url","f-stock"].forEach((id) => {
-          const el = document.getElementById(id);
-          if (el) el.value = "";
-        });
-        const zipInput = document.getElementById("f-download-file"); 
-if (zipInput) zipInput.value = "";
+        // إعادة تعيين النموذج
+        ["f-name","f-price","f-description","f-download-url","f-stock"]
+          .forEach((id) => { const el = document.getElementById(id); if (el) el.value = ""; });
 
-        document.getElementById("image-preview").classList.add("hidden");
-        selectedImageFile = null;
-
-        // Reload product data
+        selectedImages = [];
+        renderImagesGrid();
+        statusEl.classList.add("hidden");
         await loadProducts();
 
       } catch (err) {
-        showToast("Error: " + err.message, "error");
+        console.error("[Manager] Submit error:", err);
+        showToast("خطأ: " + err.message, "error");
       } finally {
-        btn.disabled = false;
-        label.textContent = "Add Product to Store";
+        btn.disabled      = false;
+        label.textContent = "نشر المنتج في المتجر";
       }
     }
 
-    function bindAddProductForm() {
-const form = document.getElementById("add-product-form"); 
-if (!form) return; 
-form.addEventListener("submit", submitProduct); 
-}
-
-    // ─────────────────────────────────────────────
-    // DELETE PRODUCT
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
+    // DELETE
+    // ─────────────────────────────────────────
     async function deleteProductById(id) {
-      if (!confirm("Delete this product? This cannot be undone.")) return;
+      if (!confirm("هل أنت متأكد من حذف هذا المنتج؟ لا يمكن التراجع.")) return;
       try {
         await deleteProduct(id);
-        showToast("Product deleted.");
+        showToast("تم حذف المنتج.");
         await loadProducts();
       } catch (err) {
-        showToast("Delete failed: " + err.message, "error");
+        showToast("فشل الحذف: " + err.message, "error");
       }
     }
 
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
     // TOOLS
-    // ─────────────────────────────────────────────
+    // ─────────────────────────────────────────
     function toolEncode() {
       const val = document.getElementById("tool-url-input").value.trim();
-      if (!val) return;
-      document.getElementById("tool-url-output").value = encodeDownloadUrl(val);
+      if (val) document.getElementById("tool-url-output").value = encodeDownloadUrl(val);
     }
     function toolDecode() {
       const val = document.getElementById("tool-url-input").value.trim();
-      if (!val) return;
-      try {
-        document.getElementById("tool-url-output").value = decodeDownloadUrl(val);
-      } catch {
-        showToast("Invalid encoded string", "error");
-      }
+      try { document.getElementById("tool-url-output").value = decodeDownloadUrl(val); }
+      catch { showToast("نص غير صالح للفك", "error"); }
     }
 
     async function exportProducts() {
       try {
         const { products } = await fetchProducts();
         const blob = new Blob([JSON.stringify(products, null, 2)], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url; a.download = "products-backup.json"; a.click();
-        URL.revokeObjectURL(url);
+        const a    = Object.assign(document.createElement("a"), { href: URL.createObjectURL(blob), download: "products-backup.json" });
+        a.click(); URL.revokeObjectURL(a.href);
       } catch (err) {
-        showToast("Export failed: " + err.message, "error");
+        showToast("فشل التصدير: " + err.message, "error");
       }
     }
-    
-    bindAddProductForm();
   </script>
 </body>
 </html>
