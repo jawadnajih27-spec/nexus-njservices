@@ -1,28 +1,29 @@
 /**
  * ============================================================
  * THE ROYAL NEXUS — NJSERVICES
- * app.js | The Brain — API + PayPal + Security Engine
+ * app.js | The Brain — API + PayPal + Security Engine (v3)
  * ============================================================
- * جميع الاتصالات بـ GitHub تمر عبر /api/github (Vercel proxy).
- * لا يوجد PAT في هذا الملف — الأسرار على السيرفر فقط.
+ * جميع الاتصالات (منتجات، مصادقة، صور) تمر عبر api/github.js.
+ * لا يوجد أي سر هنا، ولا Cloudinary — الصور تترفع مباشرة على
+ * GitHub بعد ضغطها محليا فهاد الملف.
  * ============================================================
  */
 
-// Session: يُخزَّن في الذاكرة فقط، يختفي عند إغلاق المتصفح
+// Session: كلمة السر تتخزن فالذاكرة فقط، كتختفي عند إغلاق المتصفح
 let _sessionPassword = "";
 
-/** حفظ كلمة السر في الجلسة بعد تسجيل الدخول */
+/** حفظ كلمة السر فالجلسة بعد تسجيل الدخول */
 function setSessionPassword(pw) { _sessionPassword = pw; }
 
 /** مسح الجلسة عند تسجيل الخروج */
 function clearSession() { _sessionPassword = ""; }
 
 // ════════════════════════════════════════════════════════════
-// SECTION 1: API LAYER — كل الاتصالات عبر /api/github
+// SECTION 1: API LAYER — المنتجات عبر api/github.js
 // ════════════════════════════════════════════════════════════
 
 /**
- * Fetch all products from GitHub via secure proxy
+ * جلب كل المنتجات
  * Returns: { products: [], sha: "..." }
  */
 async function fetchProducts() {
@@ -37,53 +38,38 @@ async function fetchProducts() {
 }
 
 /**
- * Save updated products array via secure proxy
- * يتحقق من كلمة السر على السيرفر عبر x-admin-password header
- *
- * @param {Array}  products - المنتجات المحدّثة
- * @param {string} sha      - SHA الحالي من fetchProducts()
- * @param {string} message  - رسالة الـ commit
+ * حفظ لائحة المنتجات المحدّثة (يتطلب تسجيل دخول)
+ * @param {Array}  products
+ * @param {string} sha       - من fetchProducts()
+ * @param {string} message   - رسالة الـ commit
  */
 async function saveProducts(products, sha, message = "Update products via Royal Nexus") {
   const res = await fetchWithTimeout(ROYAL_CONFIG.apiUrl, {
     method:  "PUT",
     headers: {
-      "Content-Type":      "application/json",
-      "x-admin-password":  _sessionPassword, // ← يُرسل للسيرفر، لا يظهر في GitHub
+      "Content-Type":     "application/json",
+      "x-admin-password": _sessionPassword,
     },
     body: JSON.stringify({ products, sha, message }),
   });
 
-  if (res.status === 401) throw new Error("غير مصرح — تحقق من كلمة السر");
+  if (res.status === 401) throw new Error("غير مصرح — سجل الدخول من جديد");
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error || `Save failed: ${res.status}`);
+    throw new Error(err.error || `فشل الحفظ: ${res.status}`);
   }
 
   return res.json();
 }
 
-/**
- * Add a new product
- */
+/** إضافة منتج جديد */
 async function addProduct(product) {
   const { products, sha } = await fetchProducts();
   products.push(product);
   return saveProducts(products, sha, `Add product: ${product.name}`);
 }
 
-/**
- * Delete a product by ID
- */
-async function deleteProduct(id) {
-  const { products, sha } = await fetchProducts();
-  const filtered = products.filter((p) => p.id !== id);
-  return saveProducts(filtered, sha, `Delete product: ${id}`);
-}
-
-/**
- * Update an existing product by ID
- */
+/** تحديث منتج موجود عبر ID */
 async function updateProduct(id, updates) {
   const { products, sha } = await fetchProducts();
   const index = products.findIndex((p) => p.id === id);
@@ -92,19 +78,22 @@ async function updateProduct(id, updates) {
   return saveProducts(products, sha, `Update product: ${id}`);
 }
 
+/** حذف منتج عبر ID */
+async function deleteProduct(id) {
+  const { products, sha } = await fetchProducts();
+  const filtered = products.filter((p) => p.id !== id);
+  return saveProducts(filtered, sha, `Delete product: ${id}`);
+}
+
 // ════════════════════════════════════════════════════════════
-// SECTION 2: AUTH — التحقق من كلمة السر عبر API
+// SECTION 2: AUTH — التحقق من كلمة السر عبر api/github.js
 // ════════════════════════════════════════════════════════════
 
 /**
- * التحقق من كلمة السر عبر Vercel API
- * السيرفر يقارنها بـ ADMIN_PASSWORD — لا شيء يظهر في المتصفح
- *
- * @param {string} password - كلمة السر المدخلة
+ * @param {string} password
  * @returns {boolean}
  */
 async function verifyAdminPassword(password) {
-  console.log("[Auth] Sending verify request to:", ROYAL_CONFIG.apiUrl);
   try {
     const res = await fetchWithTimeout(ROYAL_CONFIG.apiUrl, {
       method:  "POST",
@@ -121,42 +110,144 @@ async function verifyAdminPassword(password) {
 }
 
 // ════════════════════════════════════════════════════════════
-// SECTION 3: CLOUDINARY IMAGE UPLOAD
+// SECTION 3: الصور — ضغط محلي + رفع/حذف/لائحة عبر GitHub
+// (بلاصة Cloudinary)
 // ════════════════════════════════════════════════════════════
 
 /**
- * رفع صورة إلى Cloudinary عبر Unsigned Upload Preset
- * آمن من المتصفح — Unsigned preset مصمم للاستخدام العام
+ * تصغير/ضغط صورة بالـ canvas قبل الرفع — يحترم القيود
+ * المضبوطة فـ ROYAL_CONFIG.upload، ويحول الملف لـ base64 خام.
  *
  * @param {File} file - ملف الصورة من <input type="file">
- * @returns {string}  - رابط الصورة الآمن (https)
+ * @returns {Promise<{base64: string, mimeType: string}>}
+ */
+function compressImage(file) {
+  return new Promise((resolve, reject) => {
+    if (!file || !file.type || !file.type.startsWith("image/")) {
+      return reject(new Error("الملف المختار ماشي صورة"));
+    }
+    if (file.size > ROYAL_CONFIG.upload.maxOriginalBytes) {
+      const maxMb = (ROYAL_CONFIG.upload.maxOriginalBytes / (1024 * 1024)).toFixed(0);
+      return reject(new Error(`الصورة كبيرة بزاف (الحد الأقصى ${maxMb}MB)`));
+    }
+
+    const reader = new FileReader();
+    reader.onerror = () => reject(new Error("تعذّرت قراءة الملف"));
+    reader.onload = () => {
+      const img = new Image();
+      img.onerror = () => reject(new Error("تعذّر فتح الصورة"));
+      img.onload = () => {
+        const maxDim = ROYAL_CONFIG.upload.targetMaxDimension;
+        let { width, height } = img;
+
+        if (width > maxDim || height > maxDim) {
+          if (width >= height) {
+            height = Math.round((height * maxDim) / width);
+            width  = maxDim;
+          } else {
+            width  = Math.round((width * maxDim) / height);
+            height = maxDim;
+          }
+        }
+
+        const canvas = document.createElement("canvas");
+        canvas.width  = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(img, 0, 0, width, height);
+
+        // PNG كتبقى PNG (كتحتفظ بالشفافية) — الباقي كيتحول JPEG مضغوط
+        const outputType = file.type === "image/png" ? "image/png" : "image/jpeg";
+        const quality     = outputType === "image/jpeg" ? ROYAL_CONFIG.upload.jpegQuality : undefined;
+
+        const dataUrl = canvas.toDataURL(outputType, quality);
+        const base64  = dataUrl.split(",")[1]; // نحيدو "data:image/...;base64,"
+
+        resolve({ base64, mimeType: outputType });
+      };
+      img.src = reader.result;
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * ضغط ثم رفع صورة على GitHub عبر api/github.js (يتطلب تسجيل دخول)
+ * @param {File} file
+ * @returns {Promise<string>} - رابط الصورة الجاهز (jsDelivr CDN)
  */
 async function uploadImage(file) {
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("upload_preset", ROYAL_CONFIG.cloudinary.uploadPreset);
+  const { base64, mimeType } = await compressImage(file);
 
-  const res = await fetchWithTimeout(ROYAL_CONFIG.cloudinary.uploadUrl, {
-    method: "POST",
-    body:   formData,
-  }, 30000); // 30 ثانية لرفع الصور
+  const res = await fetchWithTimeout(`${ROYAL_CONFIG.apiUrl}?action=upload-image`, {
+    method:  "POST",
+    headers: {
+      "Content-Type":     "application/json",
+      "x-admin-password": _sessionPassword,
+    },
+    body: JSON.stringify({
+      filename:      file.name,
+      mimeType,
+      contentBase64: base64,
+    }),
+  }, 30000); // 30 ثانية — الرفع قد ياخد وقت حسب الاتصال
+
+  if (res.status === 401) throw new Error("غير مصرح — سجل الدخول من جديد");
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `فشل رفع الصورة: ${res.status}`);
+  }
+
+  const data = await res.json(); // { success, path, url }
+  return data.url;
+}
+
+/**
+ * حذف صورة من GitHub (يتطلب تسجيل دخول)
+ * @param {string} path - المسار الكامل داخل الريبو (من listUploadedImages)
+ */
+async function deleteImage(path) {
+  const res = await fetchWithTimeout(`${ROYAL_CONFIG.apiUrl}?action=delete-image`, {
+    method:  "DELETE",
+    headers: {
+      "Content-Type":     "application/json",
+      "x-admin-password": _sessionPassword,
+    },
+    body: JSON.stringify({ path }),
+  });
+
+  if (res.status === 401) throw new Error("غير مصرح — سجل الدخول من جديد");
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `فشل حذف الصورة: ${res.status}`);
+  }
+
+  return res.json();
+}
+
+/**
+ * جلب لائحة الصور المرفوعة سابقا (لعرضها كمعرض فلوحة التحكم
+ * وتفادي رفع نفس الصورة مرتين)
+ * @returns {Promise<Array<{name, path, sha, size, url}>>}
+ */
+async function listUploadedImages() {
+  const res = await fetchWithTimeout(`${ROYAL_CONFIG.apiUrl}?action=images`, { method: "GET" });
 
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    throw new Error(err.error?.message || "Cloudinary upload failed");
+    throw new Error(err.error || `فشل جلب لائحة الصور: ${res.status}`);
   }
 
   const data = await res.json();
-  return data.secure_url; // ← رابط https مباشر
+  return data.images;
 }
 
 // ════════════════════════════════════════════════════════════
-// SECTION 4: SECURITY — DOWNLOAD LINK OBFUSCATION
+// SECTION 4: SECURITY — تعتيم روابط التحميل
 // ════════════════════════════════════════════════════════════
 
 /**
- * XOR obfuscation — يُخفي رابط التحميل في products.json
- * نفس الدالة تعمل للتشفير والفك (XOR متماثل)
+ * XOR obfuscation — نفس الدالة تصلح للتشفير والفك (XOR متماثل)
+ * ⚠️ هادشي ماشي تشفير حقيقي، غير حاجز خفيف ضد النسخ العشوائي.
  */
 function xorObfuscate(text) {
   const key = ROYAL_CONFIG.security.obfuscationKey;
@@ -184,27 +275,24 @@ function decodeDownloadUrl(hex) {
 // SECTION 5: PAYPAL INTEGRATION
 // ════════════════════════════════════════════════════════════
 
-/**
- * تحميل PayPal SDK ديناميكياً
- */
+/** تحميل PayPal SDK ديناميكياً (مرة وحدة فحياة الصفحة) */
 function loadPayPalSDK() {
   return new Promise((resolve, reject) => {
     if (document.getElementById("paypal-sdk")) return resolve();
-    const script    = document.createElement("script");
-    script.id       = "paypal-sdk";
-    script.src      = ROYAL_CONFIG.paypal.sdkUrl;
-    script.onload   = resolve;
-    script.onerror  = () => reject(new Error("Failed to load PayPal SDK"));
+    const script   = document.createElement("script");
+    script.id      = "paypal-sdk";
+    script.src     = ROYAL_CONFIG.paypal.sdkUrl;
+    script.onload  = resolve;
+    script.onerror = () => reject(new Error("Failed to load PayPal SDK"));
     document.head.appendChild(script);
   });
 }
 
 /**
  * رسم زر PayPal لمنتج محدد
- *
- * @param {string}   containerId - ID عنصر الـ DOM
- * @param {Object}   product     - بيانات المنتج
- * @param {Function} onSuccess   - callback بعد نجاح الدفع
+ * @param {string}   containerId
+ * @param {Object}   product
+ * @param {Function} onSuccess - callback بعد نجاح الدفع
  */
 function renderPayPalButton(containerId, product, onSuccess) {
   paypal.Buttons({
@@ -242,7 +330,7 @@ function renderPayPalButton(containerId, product, onSuccess) {
             const downloadUrl = decodeDownloadUrl(product.downloadUrl);
             onSuccess({ product, downloadUrl, orderId: order.id, payer: order.payer });
           } else {
-            // منتج مادي → WhatsApp
+            // منتج فيزيائي → واتساب
             const msg = encodeURIComponent(
               `✅ طلب جديد!\nالمنتج: ${product.name}\nرقم الطلب: ${order.id}\nيرجى تأكيد تفاصيل الشحن.`
             );
@@ -252,7 +340,7 @@ function renderPayPalButton(containerId, product, onSuccess) {
         }
       } catch (err) {
         console.error("[RoyalNexus] Payment capture error:", err);
-        alert("فشل الدفع. يرجى المحاولة مرة أخرى أو التواصل عبر WhatsApp.");
+        alert("فشل الدفع. حاول من جديد أو تواصل معنا عبر واتساب.");
       }
     },
 
@@ -272,6 +360,11 @@ function generateId() {
   return "prod_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+/** تنسيق السعر مع رمز العملة */
+function formatPrice(price, currency = ROYAL_CONFIG.paypal.currency) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency }).format(price);
+}
+
 /** عرض Toast notification */
 function showToast(message, type = "success") {
   const toast       = document.createElement("div");
@@ -285,9 +378,7 @@ function showToast(message, type = "success") {
   }, 3500);
 }
 
-/**
- * fetch مع timeout — متوافق مع التابلت (بدون AbortController)
- */
+/** fetch مع timeout — متوافق مع التابلت (بدون AbortController) */
 function fetchWithTimeout(url, options = {}, ms = 12000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error("Request timed out")), ms);
