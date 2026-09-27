@@ -52,7 +52,7 @@ const ALLOWED_IMAGE_TYPES = {
 
 function getEnv() {
   const OWNER  = process.env.GITHUB_OWNER  || "jawadnajih27-spec";
-  const REPO   = process.env.GITHUB_REPO   || "royal-nexus-store";
+  const REPO   = process.env.GITHUB_REPO   || "nexus-njservices";
   const BRANCH = process.env.GITHUB_BRANCH || "main";
 
   return {
