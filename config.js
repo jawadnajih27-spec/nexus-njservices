@@ -1,144 +1,64 @@
 /**
  * ============================================================
  * THE ROYAL NEXUS — NJSERVICES
- * config.js | Central Configuration File
+ * config.js | Client-Side Configuration (v3)
  * ============================================================
- * ⚠️  SECURITY WARNING:
- *     This file contains sensitive credentials.
- *     - NEVER commit this file to a PUBLIC repository.
- *     - Add config.js to your .gitignore immediately.
- *     - For production, consider a Vercel Edge Function to
- *       proxy GitHub API calls and keep the PAT server-side.
+ * ✅ هذا الملف آمن 100% للنشر العلني — ما فيه حتى سر.
+ *
+ * الأسرار (GITHUB_PAT, ADMIN_PASSWORD, GITHUB_OWNER/REPO/BRANCH)
+ * كاينين فـ Vercel Environment Variables فقط، وكيتقرأو من
+ * api/github.js (سيرفر). هاد الملف ما عندوش الحق يشوفهم.
+ *
+ * ⚠️ لا Cloudinary فهاد النسخة — رفع الصور صايفي عبر
+ * api/github.js مباشرة (GitHub Contents API).
  * ============================================================
  */
 
 const ROYAL_CONFIG = {
 
   // ──────────────────────────────────────────────
-  // 🔑 GITHUB CONFIGURATION
+  // 🔌 نقطة الاتصال الوحيدة
+  // كل شيء (منتجات، تحقق كلمة السر، رفع/حذف صور) يمر من هنا
   // ──────────────────────────────────────────────
-  github: {
-    // Your GitHub Personal Access Token (Classic)
-    // Permissions needed: repo → contents (read & write)
-    // Format: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-    pat: "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",
-
-    // GitHub username / org that owns the repo
-    owner: "jawadnajih27-spec",
-
-    // Repository name where products.json lives
-    repo: "nexus-njservices",
-
-    // Branch to read/write from
-    branch: "main",
-
-    // Path to the products data file inside the repo
-    productsPath: "data/products.json",
-  
-// Path (folder) where digital ZIP files are uploaded 
-digitalProductsPath: "data/digital-products",
-  },
+  apiUrl: "/api/github",
 
   // ──────────────────────────────────────────────
-  // 💳 PAYPAL CONFIGURATION
+  // 💳 PAYPAL — Client ID فقط (مصمم أصلا ليكون عام، ماشي سر)
   // ──────────────────────────────────────────────
   paypal: {
-    // Your PayPal REST App Client ID
-    // Get it from: https://developer.paypal.com/dashboard/applications
-    clientId: "sb-47vnw25183861@business.paypal.com",
-
-    // Currency for all transactions
+    clientId: "YOUR_PAYPAL_CLIENT_ID_HERE",
     currency: "USD",
-
-    // PayPal SDK URL (auto-injects clientId & currency)
     get sdkUrl() {
-   const clientId = (this.clientId || "").trim();
-      const safeClientId = clientId && !clientId.includes("@") ? clientId : "sb";
-      return `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(safeClientId)}&currency=${encodeURIComponent(this.currency)}&intent=capture&components=buttons`;   
+      return `https://www.paypal.com/sdk/js?client-id=${this.clientId}&currency=${this.currency}`;
     },
   },
 
   // ──────────────────────────────────────────────
-  // 🖼️  CLOUDINARY CONFIGURATION (Image Hosting)
+  // 🖼️ رفع الصور (بلاصة Cloudinary)
+  // الضغط/التصغير كيتم محليا فـ app.js (canvas) قبل الإرسال
+  // لـ api/github.js — هادشي كيخلي الصور ديما تحت الحد المسموح
   // ──────────────────────────────────────────────
-  cloudinary: {
-    cloudName: "dztczxekd",
-    uploadPreset: "royal_nexus_unsigned", // Create an "unsigned" upload preset in Cloudinary dashboard
-    get uploadUrl() {
-      return `https://api.cloudinary.com/v1_1/${this.cloudName}/image/upload`;
-    },
+  upload: {
+    maxOriginalBytes:   8 * 1024 * 1024, // 8MB — أقصى حجم مقبول من الجهاز قبل الضغط
+    targetMaxDimension: 1600,             // أطول ضلع للصورة بعد الضغط (بالبكسل)
+    jpegQuality:        0.82,             // جودة الضغط لصيغة JPEG
   },
 
   // ──────────────────────────────────────────────
-  // 🔐 MANAGER DASHBOARD
-  // ──────────────────────────────────────────────
-  manager: {
-    // Simple access password for manager.html
-    // For production, replace with a proper auth system
-    accessPassword = process.env.ADMIN_PASSWORD;
-  },
-
-  // ──────────────────────────────────────────────
-  // 🔒 DOWNLOAD LINK SECURITY
+  // 🔒 تعتيم روابط التحميل (XOR خفيف، ماشي تشفير حقيقي)
   // ──────────────────────────────────────────────
   security: {
-    // A random secret key used to XOR-obfuscate download URLs
-    // Change this to any random string — keep it secret
-    // This is a lightweight obfuscation layer (not cryptography)
-    // For real security, use a server-side signed URL system
     obfuscationKey: "NJSERVICES_ROYAL_KEY_2025",
   },
 
   // ──────────────────────────────────────────────
-  // 🌐 STORE SETTINGS
+  // 🌐 إعدادات المتجر
   // ──────────────────────────────────────────────
   store: {
-    name: "NJSERVICES Royal Nexus",
-    tagline: "Digital Excellence. Delivered.",
-    logo: "NJ",
-    whatsapp: "+212600000000", // For physical product orders
+    name:        "NJSERVICES Royal Nexus",
+    tagline:     "Digital Excellence. Delivered.",
+    logo:        "NJ",
+    whatsapp:    "+212703652247", // لطلبات المنتجات الفيزيائية
     successPage: "success.html",
   },
 };
-
-// ──────────────────────────────────────────────────────────
-// Helper: Build GitHub API Authorization header
-// Always uses "token" prefix (required for Classic PAT)
-// ──────────────────────────────────────────────────────────
-function getGitHubHeaders() {
-  const headers = {
-    "Accept": "application/vnd.github+json",
-    "Content-Type": "application/json",
-  };
-
-  const pat = (ROYAL_CONFIG.github.pat || "").trim();
-
-  // Support both classic and fine-grained tokens; avoid sending empty auth header.
-  if (pat) {
-    headers["Authorization"] = pat.startsWith("github_pat_") ? `Bearer ${pat}` : `token ${pat}`;
-  }
-
-  return headers;
-}
-// ──────────────────────────────────────────────────────────
-// Helper: Build GitHub Contents API URL
-// ──────────────────────────────────────────────────────────
-function getGitHubUrl(path, options = {}) {
-  const { owner, repo } = ROYAL_CONFIG.github;
-  const normalizedPath = String(path || "").replace(/^\/+/, "");
-  const url = new URL(`https://api.github.com/repos/${owner}/${repo}/contents/${normalizedPath}`);
-  
-  if (options.ref) {
-    url.searchParams.set("ref", options.ref);
-  }
-  // No trailing slash — common source of 404 errors
-  return url.toString();
-}
-
-// Expose config/helpers on window so manager.html can detect and reuse 
-// config.js instead of falling back to its built-in emergency defaults. 
-if (typeof window !== "undefined") { 
-window.ROYAL_CONFIG = ROYAL_CONFIG; 
-window.getGitHubHeaders = getGitHubHeaders; 
-window.getGitHubUrl = getGitHubUrl; 
-}
