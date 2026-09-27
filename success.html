@@ -209,7 +209,7 @@
   </div>
 
   <!-- Footer -->
-  <p class="text-xs text-muted mt-8 font-display italic">Royal Nexus © 2025 · NJSERVICES</p>
+  <p class="text-xs text-muted mt-8 font-display italic">Royal Nexus © <span id="footer-year"></span> · NJSERVICES</p>
 
   <!-- Scripts -->
   <script src="config.js"></script>
@@ -218,11 +218,13 @@
     /**
      * success.html — Reads the purchase data from URL hash params.
      *
-     * After PayPal onApprove, redirect here with:
+     * If ever linked to, redirect here with:
      * success.html#product=NAME&orderId=XXX&dl=ENCODED_HEX_URL
      *
      * The encoded download URL is decoded client-side using app.js decodeDownloadUrl()
      */
+
+    document.getElementById("footer-year").textContent = new Date().getFullYear();
 
     (function init() {
       // Set up WhatsApp support links
