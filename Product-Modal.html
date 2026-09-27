@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Royal Nexus — Product Modal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ═══════════════════════════════════════════
+       BASE
+    ═══════════════════════════════════════════ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "DM Sans", sans-serif;
+      background: #FDFDFD;
+      color: #1A1A2E;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════
+       MODAL OVERLAY
+    ═══════════════════════════════════════════ */
+    .rn-overlay {
+      position: fixed; inset: 0; z-index: 900;
+      display: flex; align-items: center; justify-content: center;
+      padding: 16px;
+      background: rgba(10, 8, 20, 0.72);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+    }
+    .rn-overlay.open { opacity: 1; pointer-events: all; }
+
+    /* ═══════════════════════════════════════════
+       MODAL CARD
+    ═══════════════════════════════════════════ */
+    .rn-modal {
+      position: relative;
+      width: 100%;
+      max-width: 520px;
+      max-height: 92vh;
+      overflow-y: auto;
+      overflow-x: hidden;
+      background: #FDFDFD;
+      border-radius: 20px;
+      box-shadow:
+        0 0 0 1px rgba(255,255,255,0.6) inset,
+        0 32px 80px rgba(10,8,20,0.28),
+        0 8px 24px rgba(75,0,130,0.12);
+      transform: scale(0.92) translateY(24px);
+      transition: transform 0.42s cubic-bezier(0.34, 1.46, 0.64, 1);
+      scrollbar-width: none;
+    }
+    .rn-modal::-webkit-scrollbar { display: none; }
+    .rn-overlay.open .rn-modal { transform: scale(1) translateY(0); }
+
+    .rn-close {
+      position: absolute; top: 14px; inset-inline-end: 14px; z-index: 10;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: rgba(26,26,46,0.08);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s, transform 0.2s;
+    }
+    .rn-close:hover { background: rgba(26,26,46,0.15); transform: scale(1.08); }
+    .rn-close svg { width: 14px; height: 14px; }
+
+    /* ═══════════════════════════════════════════
+       SECTION 1 — TITLE
+    ═══════════════════════════════════════════ */
+    .rn-title-wrap { padding: 28px 28px 18px; }
+    .rn-eyebrow {
+      font-size: 10px; font-weight: 500;
+      letter-spacing: 0.12em; text-transform: uppercase;
+      color: #9B8EC4;
+      margin-bottom: 6px;
+    }
+    .rn-title {
+      font-family: "Cormorant Garamond", serif;
+      font-size: clamp(24px, 5vw, 30px);
+      font-weight: 500; line-height: 1.15;
+      color: #1A1A2E;
+    }
+
+    /* ═══════════════════════════════════════════
+       SECTION 2 — IMAGE CAROUSEL
+    ═══════════════════════════════════════════ */
+    .rn-carousel { position: relative; width: 100%; overflow: hidden; background: #F0EEF8; aspect-ratio: 16 / 9; }
+    .rn-slides { display: flex; height: 100%; transition: transform 0.5s cubic-bezier(0.77, 0, 0.175, 1); will-change: transform; }
+    .rn-slide { flex: 0 0 100%; height: 100%; overflow: hidden; }
+    .rn-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .rn-slide-placeholder { width: 100%; height: 100%; background: linear-gradient(135deg, #EDE9F5, #F5E6E8); display: flex; align-items: center; justify-content: center; }
+
+    .rn-dots { position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%); display: flex; gap: 7px; align-items: center; }
+    .rn-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.45); border: 1px solid rgba(255,255,255,0.6); cursor: pointer; transition: all 0.3s ease; padding: 0; }
+    .rn-dot.active { background: #FDFDFD; width: 20px; border-radius: 3px; }
+
+    /* ═══════════════════════════════════════════
+       SECTION 3 — SUBTITLE
+    ═══════════════════════════════════════════ */
+    .rn-subtitle-wrap { padding: 16px 28px 0; }
+    .rn-subtitle { font-family: "Cormorant Garamond", serif; font-size: 15px; font-weight: 400; font-style: italic; color: #6B6080; line-height: 1.5; }
+
+    .rn-divider { padding: 18px 28px 0; line-height: 0; }
+    .rn-divider svg { width: 100%; display: block; }
+
+    /* ═══════════════════════════════════════════
+       SECTION 4 — DETAILS & DESCRIPTION
+    ═══════════════════════════════════════════ */
+    .rn-body { padding: 18px 28px 0; }
+    .rn-price-row { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+    .rn-price { font-family: "Cormorant Garamond", serif; font-size: 32px; font-weight: 600; color: #8B0000; letter-spacing: -0.02em; }
+    .rn-type-tag { font-size: 10px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; padding: 4px 12px; border-radius: 20px; }
+    .rn-type-tag.digital { background: rgba(75,0,130,0.09); color: #4B0082; border: 1px solid rgba(75,0,130,0.18); }
+    .rn-type-tag.physical { background: rgba(139,0,0,0.08); color: #8B0000; border: 1px solid rgba(139,0,0,0.16); }
+    .rn-description { font-size: 13.5px; font-weight: 300; line-height: 1.75; color: #4A4A5A; margin-bottom: 20px; }
+
+    /* ═══════════════════════════════════════════
+       PAYPAL BUTTON AREA
+    ═══════════════════════════════════════════ */
+    .rn-paypal-wrap { padding: 0 28px 8px; }
+
+    .rn-download-card {
+      margin: 0 28px 8px;
+      background: linear-gradient(135deg, rgba(75,0,130,0.05), rgba(139,0,0,0.04));
+      border: 1px solid rgba(75,0,130,0.14);
+      border-radius: 12px; padding: 18px;
+      display: none;
+    }
+    .rn-download-card.visible { display: block; }
+    .rn-download-btn {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      width: 100%; padding: 12px; border-radius: 10px;
+      background: linear-gradient(135deg, #4B0082, #7B2FBE);
+      color: #FDFDFD; text-decoration: none;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 4px 16px rgba(75,0,130,0.28);
+      transition: box-shadow 0.2s, transform 0.2s;
+      margin-top: 10px;
+    }
+    .rn-download-btn:hover { box-shadow: 0 6px 24px rgba(75,0,130,0.38); transform: translateY(-1px); }
+
+    .rn-footer-divider { padding: 16px 28px 0; line-height: 0; }
+    .rn-footer-divider svg { width: 100%; display: block; }
+
+    /* ═══════════════════════════════════════════
+       SECTION 5 — FOOTER
+    ═══════════════════════════════════════════ */
+    .rn-footer { padding: 14px 28px 22px; display: flex; align-items: center; justify-content: space-between; }
+    .rn-footer-brand { display: flex; align-items: center; gap: 8px; }
+    .rn-footer-logo {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(135deg, #8B0000, #4B0082);
+      color: #FDFDFD; font-size: 11px; font-weight: 700;
+      font-family: "DM Sans", sans-serif; flex-shrink: 0;
+    }
+    .rn-footer-name { font-size: 11px; font-weight: 500; color: #9B8EC4; letter-spacing: 0.04em; }
+
+    .rn-socials { display: flex; align-items: center; gap: 10px; }
+    .rn-social-link {
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(75,0,130,0.06);
+      border: 1px solid rgba(75,0,130,0.1);
+      transition: all 0.22s ease;
+      text-decoration: none;
+    }
+    .rn-social-link:hover { background: rgba(75,0,130,0.12); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(75,0,130,0.15); }
+    .rn-social-link svg { width: 15px; height: 15px; }
+
+    /* ═══════════════════════════════════════════
+       PRODUCT GRID (real products from the store)
+    ═══════════════════════════════════════════ */
+    .demo-grid {
+      max-width: 900px; margin: 60px auto; padding: 0 20px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .demo-card {
+      border-radius: 14px; overflow: hidden; cursor: pointer;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid rgba(255,255,255,0.9);
+      box-shadow: 0 2px 12px rgba(75,0,130,0.07);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .demo-card:hover { transform: translateY(-5px); box-shadow: 0 8px 28px rgba(75,0,130,0.13); }
+    .demo-card-img { width: 100%; height: 180px; object-fit: cover; display: block; background: linear-gradient(135deg, #EDE9F5, #F5E6E8); }
+    .demo-card-body { padding: 16px; }
+    .demo-card-name { font-family: "Cormorant Garamond", serif; font-size: 18px; font-weight: 500; color: #1A1A2E; margin-bottom: 4px; }
+    .demo-card-price { font-size: 14px; font-weight: 500; color: #8B0000; }
+    .demo-card-cta {
+      margin-top: 12px; width: 100%; padding: 9px;
+      border-radius: 8px; border: none; cursor: pointer;
+      background: linear-gradient(135deg, #8B0000, #C41E3A);
+      color: #FDFDFD; font-size: 12px; font-weight: 500;
+      font-family: "DM Sans", sans-serif;
+      transition: opacity 0.2s;
+    }
+    .demo-card-cta:hover { opacity: 0.88; }
+
+    .royal-toast {
+      position: fixed; bottom: 24px; left: 50%;
+      transform: translateX(-50%) translateY(70px);
+      background: #1A1A2E; color: #FDFDFD;
+      padding: 11px 22px; border-radius: 10px;
+      font-size: 13px; font-weight: 500;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.18);
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1);
+      z-index: 9999;
+    }
+    .royal-toast.visible { transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════
+       PRODUCT CARDS (real catalogue, opens the rich modal)
+  ════════════════════════════════════════ -->
+  <div class="demo-grid" id="product-grid">
+    <!-- Populated by JS from fetchProducts() -->
+  </div>
+
+  <!-- ════════════════════════════════════════
+       PRODUCT MODAL
+  ════════════════════════════════════════ -->
+  <div class="rn-overlay" id="rn-overlay" role="dialog" aria-modal="true">
+    <div class="rn-modal" id="rn-modal">
+
+      <button class="rn-close" id="rn-close" aria-label="Close">
+        <svg viewBox="0 0 14 14" fill="none" stroke="#1A1A2E" stroke-width="2" stroke-linecap="round">
+          <line x1="1" y1="1" x2="13" y2="13"/>
+          <line x1="13" y1="1" x2="1" y2="13"/>
+        </svg>
+      </button>
+
+      <!-- 1. TITLE -->
+      <div class="rn-title-wrap">
+        <p class="rn-eyebrow" id="modal-eyebrow">NJSERVICES · Digital Product</p>
+        <h2 class="rn-title" id="modal-title">Product Name</h2>
+      </div>
+
+      <!-- 2. CAROUSEL -->
+      <div class="rn-carousel" id="rn-carousel">
+        <div class="rn-slides" id="rn-slides"></div>
+        <div class="rn-dots" id="rn-dots"></div>
+      </div>
+
+      <!-- 3. SUBTITLE (hidden automatically if the product has none) -->
+      <div class="rn-subtitle-wrap" id="modal-subtitle-wrap">
+        <p class="rn-subtitle" id="modal-subtitle"></p>
+      </div>
+
+      <!-- SVG DIVIDER 1 -->
+      <div class="rn-divider">
+        <svg viewBox="0 0 464 12" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <line x1="0" y1="6" x2="190" y2="6" stroke="url(#grad-left)" stroke-width="0.75"/>
+          <g transform="translate(232,6)">
+            <path d="M0,-4 L3,0 L0,4 L-3,0 Z" fill="#C41E3A" opacity="0.5"/>
+            <circle cx="-9"  cy="0" r="1.2" fill="#4B0082" opacity="0.35"/>
+            <circle cx="9"   cy="0" r="1.2" fill="#4B0082" opacity="0.35"/>
+            <circle cx="-16" cy="0" r="0.8" fill="#C9A84C" opacity="0.4"/>
+            <circle cx="16"  cy="0" r="0.8" fill="#C9A84C" opacity="0.4"/>
+          </g>
+          <line x1="274" y1="6" x2="464" y2="6" stroke="url(#grad-right)" stroke-width="0.75"/>
+          <defs>
+            <linearGradient id="grad-left" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#FDFDFD"/>
+              <stop offset="100%" stop-color="#8B0000" stop-opacity="0.4"/>
+            </linearGradient>
+            <linearGradient id="grad-right" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#4B0082" stop-opacity="0.4"/>
+              <stop offset="100%" stop-color="#FDFDFD"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- 4. BODY: PRICE + DESCRIPTION -->
+      <div class="rn-body">
+        <div class="rn-price-row">
+          <span class="rn-price" id="modal-price">$0.00</span>
+          <span class="rn-type-tag digital" id="modal-type-tag">Digital</span>
+        </div>
+        <p class="rn-description" id="modal-description">Product description goes here.</p>
+      </div>
+
+      <!-- 5. PAYPAL BUTTON -->
+      <div class="rn-paypal-wrap">
+        <div id="rn-paypal-container"></div>
+      </div>
+
+      <!-- DOWNLOAD / CONFIRMATION CARD — content built dynamically by handlePaymentSuccess() -->
+      <div class="rn-download-card" id="rn-download-card"></div>
+
+      <!-- SVG FOOTER DIVIDER -->
+      <div class="rn-footer-divider">
+        <svg viewBox="0 0 464 1" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+          <line x1="28" y1="0.5" x2="436" y2="0.5" stroke="url(#footer-grad)" stroke-width="0.75"/>
+          <defs>
+            <linearGradient id="footer-grad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%"   stop-color="#FDFDFD"/>
+              <stop offset="30%"  stop-color="#4B0082" stop-opacity="0.2"/>
+              <stop offset="70%"  stop-color="#8B0000" stop-opacity="0.2"/>
+              <stop offset="100%" stop-color="#FDFDFD"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+
+      <!-- 6. FOOTER -->
+      <div class="rn-footer">
+        <div class="rn-footer-brand">
+          <div class="rn-footer-logo">NJ</div>
+          <span class="rn-footer-name">NJSERVICES</span>
+        </div>
+
+        <div class="rn-socials">
+          <a class="rn-social-link" id="footer-whatsapp" href="#" target="_blank" aria-label="WhatsApp" title="WhatsApp">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#25D366"/>
+              <path d="M12 2C6.477 2 2 6.477 2 12c0 1.89.525 3.66 1.438 5.168L2 22l4.978-1.413A9.953 9.953 0 0 0 12 22c5.523 0 10-4.477 10-10S17.523 2 12 2zm0 18.182a8.182 8.182 0 0 1-4.174-1.14l-.299-.178-3.094.879.842-3.257-.196-.334A8.182 8.182 0 1 1 12 20.182z" fill="#25D366"/>
+            </svg>
+          </a>
+
+          <a class="rn-social-link" href="https://instagram.com/njservices" target="_blank" aria-label="Instagram" title="Instagram">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <defs>
+                <linearGradient id="ig-grad" x1="0" y1="24" x2="24" y2="0" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%"   stop-color="#F58529"/>
+                  <stop offset="50%"  stop-color="#DD2A7B"/>
+                  <stop offset="100%" stop-color="#8134AF"/>
+                </linearGradient>
+              </defs>
+              <rect x="2" y="2" width="20" height="20" rx="5.5" stroke="url(#ig-grad)" stroke-width="1.75" fill="none"/>
+              <circle cx="12" cy="12" r="4.5" stroke="url(#ig-grad)" stroke-width="1.75" fill="none"/>
+              <circle cx="17.5" cy="6.5" r="1" fill="url(#ig-grad)"/>
+            </svg>
+          </a>
+
+          <a class="rn-social-link" href="https://facebook.com/njservices" target="_blank" aria-label="Facebook" title="Facebook">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"
+                    stroke="#1877F2" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /.rn-modal -->
+  </div><!-- /.rn-overlay -->
+
+  <!-- Scripts -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // ══════════════════════════════════════════════════════
+    // i18n — نفس لغة الموقع المحفوظة من index.html
+    // ══════════════════════════════════════════════════════
+    let currentLang = localStorage.getItem("royalLang") || "ar";
+
+    function localized(field) {
+      if (!field) return "";
+      if (typeof field === "string") return field;
+      return field[currentLang] || field.ar || field.en || "";
+    }
+
+    const STRINGS = {
+      ar: {
+        eyebrowDigital: "NJSERVICES · منتج رقمي",
+        eyebrowPhysical: "NJSERVICES · منتج فيزيائي",
+        tagDigital: "⚡ رقمي",
+        tagPhysical: "📦 فيزيائي",
+        ctaDigital: "⚡ عرض وشراء",
+        ctaPhysical: "📦 عرض التفاصيل",
+        paymentConfirmed: "تم تأكيد الدفع",
+        orderIdPrefix: "رقم الطلب: ",
+        downloadBtn: "تحميل منتجك",
+        physicalNotice: "سنتواصل معك عبر واتساب لتأكيد تفاصيل الشحن.",
+        loadError: "تعذر تحميل المنتجات",
+      },
+      en: {
+        eyebrowDigital: "NJSERVICES · Digital Product",
+        eyebrowPhysical: "NJSERVICES · Physical Product",
+        tagDigital: "⚡ Digital",
+        tagPhysical: "📦 Physical",
+        ctaDigital: "⚡ View & Buy",
+        ctaPhysical: "📦 View Details",
+        paymentConfirmed: "Payment Confirmed",
+        orderIdPrefix: "Order ID: ",
+        downloadBtn: "Download Your Product",
+        physicalNotice: "We'll reach out on WhatsApp to confirm shipping details.",
+        loadError: "Could not load products",
+      },
+    };
+    function s(key) { return (STRINGS[currentLang] && STRINGS[currentLang][key]) || key; }
+
+    // ══════════════════════════════════════════════════════
+    // PRODUCT CARDS — بيانات حقيقية عبر fetchProducts()
+    // ══════════════════════════════════════════════════════
+    let allProducts = [];
+
+    function renderProductCards(products) {
+      const grid = document.getElementById("product-grid");
+      grid.innerHTML = products.map((p) => `
+        <div class="demo-card" onclick="openProductModal('${p.id}')">
+          <img class="demo-card-img"
+               src="${(p.images && p.images[0]) || p.imageUrl || ''}"
+               alt="${localized(p.name)}"
+               loading="lazy" />
+          <div class="demo-card-body">
+            <p class="demo-card-name">${localized(p.name)}</p>
+            <p class="demo-card-price">${formatPrice(p.price)}</p>
+            <button class="demo-card-cta" onclick="event.stopPropagation(); openProductModal('${p.id}')">
+              ${p.type === 'digital' ? s('ctaDigital') : s('ctaPhysical')}
+            </button>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    // ══════════════════════════════════════════════════════
+    // MODAL LOGIC
+    // ══════════════════════════════════════════════════════
+    let currentProduct = null;
+    let currentSlide    = 0;
+
+    function openProductModal(productId) {
+      const product = allProducts.find((p) => p.id === productId);
+      if (!product) return;
+      currentProduct = product;
+      currentSlide   = 0;
+
+      document.getElementById("modal-eyebrow").textContent =
+        product.type === 'digital' ? s('eyebrowDigital') : s('eyebrowPhysical');
+      document.getElementById("modal-title").textContent = localized(product.name);
+
+      // Subtitle — optional field, hidden gracefully if the product has none
+      const subtitleWrap = document.getElementById("modal-subtitle-wrap");
+      const subtitleText = localized(product.subtitle);
+      if (subtitleText) {
+        document.getElementById("modal-subtitle").textContent = subtitleText;
+        subtitleWrap.style.display = "";
+      } else {
+        subtitleWrap.style.display = "none";
+      }
+
+      document.getElementById("modal-price").textContent = formatPrice(product.price);
+      document.getElementById("modal-description").textContent = localized(product.description);
+
+      const tag = document.getElementById("modal-type-tag");
+      tag.textContent = product.type === 'digital' ? s('tagDigital') : s('tagPhysical');
+      tag.className   = `rn-type-tag ${product.type}`;
+
+      // يدعم عدة صور (product.images) أو صورة واحدة (product.imageUrl) بالتوافق مع الماضي
+      const images = (product.images && product.images.length)
+        ? product.images
+        : (product.imageUrl ? [product.imageUrl] : []);
+      buildCarousel(images);
+
+      document.getElementById("rn-paypal-container").innerHTML = "";
+      document.getElementById("rn-paypal-container").style.display = "";
+      document.getElementById("rn-download-card").classList.remove("visible");
+
+      renderPayPalButton("rn-paypal-container", product, handlePaymentSuccess);
+
+      document.getElementById("rn-overlay").classList.add("open");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      document.getElementById("rn-overlay").classList.remove("open");
+      document.body.style.overflow = "";
+      currentProduct = null;
+    }
+
+    // ── CAROUSEL ─────────────────────────────────────────
+    function buildCarousel(images) {
+      const slidesEl = document.getElementById("rn-slides");
+      const dotsEl   = document.getElementById("rn-dots");
+
+      if (!images || images.length === 0) {
+        slidesEl.innerHTML = `
+          <div class="rn-slide">
+            <div class="rn-slide-placeholder">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="rgba(75,0,130,0.25)" stroke-width="1.5">
+                <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
+                <polyline points="21,15 16,10 5,21"/>
+              </svg>
+            </div>
+          </div>`;
+        dotsEl.innerHTML = "";
+        return;
+      }
+
+      slidesEl.innerHTML = images.map((src) => `
+        <div class="rn-slide">
+          <img src="${src}" alt="" loading="lazy" />
+        </div>
+      `).join("");
+
+      dotsEl.innerHTML = images.map((_, i) => `
+        <button class="rn-dot ${i === 0 ? 'active' : ''}"
+                onclick="goToSlide(${i})"
+                aria-label="Slide ${i + 1}"></button>
+      `).join("");
+
+      dotsEl.style.display = images.length <= 1 ? "none" : "flex";
+
+      goToSlide(0, false);
+    }
+
+    function goToSlide(index, animate = true) {
+      const slides = document.getElementById("rn-slides");
+      const dots   = document.querySelectorAll(".rn-dot");
+      const total  = currentProduct
+        ? ((currentProduct.images && currentProduct.images.length) || (currentProduct.imageUrl ? 1 : 0)) || 1
+        : 1;
+
+      currentSlide = (index + total) % total;
+
+      if (!animate) slides.style.transition = "none";
+      slides.style.transform = `translateX(-${currentSlide * 100}%)`;
+      if (!animate) setTimeout(() => slides.style.transition = "", 10);
+
+      dots.forEach((d, i) => d.classList.toggle("active", i === currentSlide));
+    }
+
+    // Touch swipe support for carousel
+    let touchStartX = 0;
+    document.getElementById("rn-carousel").addEventListener("touchstart", (e) => {
+      touchStartX = e.touches[0].clientX;
+    }, { passive: true });
+    document.getElementById("rn-carousel").addEventListener("touchend", (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) goToSlide(currentSlide + (diff > 0 ? 1 : -1));
+    });
+
+    // ── PAYMENT SUCCESS (digital → download / physical → WhatsApp notice) ──
+    function handlePaymentSuccess({ downloadUrl, orderId, isPhysical }) {
+      document.getElementById("rn-paypal-container").style.display = "none";
+      const card = document.getElementById("rn-download-card");
+
+      const header = `
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:${isPhysical ? '0' : '8px'};">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+            <circle cx="10" cy="10" r="10" fill="rgba(75,0,130,0.1)"/>
+            <polyline points="5,10 8.5,13.5 15,7" stroke="#4B0082" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <div>
+            <p style="font-size:13px; font-weight:600; color:#1A1A2E;">${s('paymentConfirmed')}</p>
+            <p style="font-size:11px; color:#6B7280;">${s('orderIdPrefix')}${orderId}</p>
+          </div>
+        </div>`;
+
+      card.innerHTML = isPhysical
+        ? `${header}<p style="font-size:12px; color:#6B7280; margin-top:10px;">${s('physicalNotice')}</p>`
+        : `${header}
+           <a class="rn-download-btn" href="${downloadUrl}" target="_blank">
+             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+             ${s('downloadBtn')}
+           </a>`;
+
+      card.classList.add("visible");
+    }
+
+    // ── CLOSE HANDLERS ────────────────────────────────────
+    document.getElementById("rn-close").addEventListener("click", closeModal);
+    document.getElementById("rn-overlay").addEventListener("click", (e) => {
+      if (e.target === document.getElementById("rn-overlay")) closeModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeModal();
+      if (e.key === "ArrowRight") goToSlide(currentSlide + 1);
+      if (e.key === "ArrowLeft")  goToSlide(currentSlide - 1);
+    });
+
+    // ── BOOT ──────────────────────────────────────────────
+    async function init() {
+      document.documentElement.lang = currentLang;
+      document.documentElement.dir = currentLang === "ar" ? "rtl" : "ltr";
+      document.getElementById("footer-whatsapp").href = `https://wa.me/${ROYAL_CONFIG.store.whatsapp}`;
+
+      loadPayPalSDK().catch((err) => console.error(err));
+
+      try {
+        const { products } = await fetchProducts();
+        allProducts = products;
+        renderProductCards(products);
+      } catch (err) {
+        console.error(err);
+        document.getElementById("product-grid").innerHTML =
+          `<p style="color:#6B7280; grid-column:1/-1; text-align:center; padding:40px 0;">${s('loadError')}</p>`;
+      }
+    }
+
+    init();
+  </script>
+</body>
+</html>
