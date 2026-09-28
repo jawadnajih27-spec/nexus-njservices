@@ -26,9 +26,7 @@ const ROYAL_CONFIG = {
   // 💳 PAYPAL — Client ID فقط (مصمم أصلا ليكون عام، ماشي سر)
   // ──────────────────────────────────────────────
   paypal: {
-    clientId: "AZDxjD3539824_SampleClientId_Dummy1234567890abcdefghijklmnopqrstuvwxyz
-
-",
+    clientId: "AZDxjD3539824_SampleClientId_Dummy1234567890abcdefghijklmnopqrstuvwxyz",
     currency: "USD",
     get sdkUrl() {
       return `https://www.paypal.com/sdk/js?client-id=${this.clientId}&currency=${this.currency}`;
