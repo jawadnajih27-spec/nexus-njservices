@@ -26,7 +26,9 @@ const ROYAL_CONFIG = {
   // 💳 PAYPAL — Client ID فقط (مصمم أصلا ليكون عام، ماشي سر)
   // ──────────────────────────────────────────────
   paypal: {
-    clientId: "AZDxjD3539824_SampleClientId_Dummy1234567890abcdefghijklmnopqrstuvwxyz",
+    // "sb" = shortcut رسمي ديال PayPal لاختبار Sandbox — الأزرار غادي تبان وتخدم
+    // (بفلوس تجريبية غير حقيقية). بدلها بـ Client ID حقيقي (Live) ملي يكون جاهز.
+    clientId: "sb",
     currency: "USD",
     get sdkUrl() {
       return `https://www.paypal.com/sdk/js?client-id=${this.clientId}&currency=${this.currency}`;
@@ -58,7 +60,7 @@ const ROYAL_CONFIG = {
     name:        "NJSERVICES Royal Nexus",
     tagline:     "Digital Excellence. Delivered.",
     logo:        "NJ",
-    whatsapp:    "+212703652247", // لطلبات المنتجات الفيزيائية
+    whatsapp:    "+212600000000", // لطلبات المنتجات الفيزيائية
     successPage: "success.html",
   },
 };
