@@ -57,7 +57,7 @@ const ROYAL_CONFIG = {
   // 🌐 إعدادات المتجر
   // ──────────────────────────────────────────────
   store: {
-    name:        "NJSERVICES Royal Nexus",
+    name:        "nexus-njservices",
     tagline:     "Digital Excellence. Delivered.",
     logo:        "NJ",
     whatsapp:    "+212600000000", // لطلبات المنتجات الفيزيائية
