@@ -31,22 +31,5 @@
     "imageUrl": "https://images.unsplash.com/photo-1531346878377-a5be20888e57?w=900&q=80",
     "downloadUrl": "",
     "createdAt": "2025-01-01T00:00:00.000Z"
-  },
-  {
-    "id": "prod_mujpcbgnpw1yw",
-    "name": {
-      "ar": "صفحة هبوط",
-      "en": "Landing page"
-    },
-    "type": "digital",
-    "price": 10,
-    "description": {
-      "ar": "صفحة هبوط فاخرة",
-      "en": "Landing page premium"
-    },
-    "imageUrl": "https://cdn.jsdelivr.net/gh/jawadnajih27-spec/nexus-njservices@main/images/1790502279312-1790506500600-a48bvu.jpg",
-    "createdAt": "2026-09-27T10:55:02.663Z",
-    "downloadUrl": "2020202020202020202071242a2b2229336524292f",
-    "stock": null
   }
 ]
